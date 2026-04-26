@@ -1,0 +1,6 @@
+{
+  "name": "Automata Compiler Visualizer",
+  "description": "A comprehensive visualizer and simulator for DFA, PDA, and CFG automata with step-by-step simulation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
