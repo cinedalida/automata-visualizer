@@ -17,7 +17,7 @@ The Automata Compiler Visualizer is a powerful, interactive web application desi
 /
 ├── public/                 # Static assets
 ├── src/
-│   ├── cfg/                # Context-Free Grammar logic and UI (CURRENTLY NOT PUSHED)
+│   ├── cfg/                # Context-Free Grammar logic and UI
 │   │   ├── CFGSimulatorUI.tsx
 │   │   ├── cfgData.ts
 │   │   └── cfgEngine.ts
@@ -25,7 +25,7 @@ The Automata Compiler Visualizer is a powerful, interactive web application desi
 │   │   ├── DFASimulatorUI.tsx
 │   │   ├── dfaData.ts
 │   │   └── dfaSimulator.ts
-│   ├── pda/                # Pushdown Automata logic and UI (CURRENTLY NOT PUSHED)
+│   ├── pda/                # Pushdown Automata logic and UI
 │   │   ├── PDASimulatorUI.tsx
 │   │   ├── pdaData.ts
 │   │   └── pdaSimulator.ts
