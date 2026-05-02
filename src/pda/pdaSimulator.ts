@@ -1,4 +1,4 @@
-import { PDA, PDATransition } from '../types';
+import { PDA, PDATransition } from "../types";
 
 interface StackItem {
   id: string;
@@ -28,6 +28,7 @@ export class PDASimulator {
   private path: SimulationStep[] = [];
   private currentStepIdx: number = 0;
   private idCounter: number = 0;
+  private readonly EPSILON = ""; // Standardize epsilon constant[cite: 3]
 
   constructor(pda: PDA, input: string) {
     this.pda = pda;
@@ -47,14 +48,13 @@ export class PDASimulator {
       inputIdx: 0,
       lastTransitionIdx: null,
       parent: null,
-      historyLog: `Start: state=${this.pda.startState}, stack=[${this.pda.startStackSymbol}]`
+      historyLog: `Start: state=${this.pda.startState}, stack=[${this.pda.startStackSymbol}]`,
     };
 
     const queue: SearchNode[] = [startNode];
     const visited = new Set<string>();
     const maxIterations = 5000;
     let iterations = 0;
-
     let bestNode: SearchNode = startNode;
     let foundAccepting = false;
 
@@ -62,47 +62,61 @@ export class PDASimulator {
       iterations++;
       const current = queue.shift()!;
 
-      // Acceptance check
-      if (current.inputIdx === this.input.length && this.pda.acceptStates.includes(current.state)) {
+      if (
+        current.inputIdx === this.input.length &&
+        this.pda.acceptStates.includes(current.state)
+      ) {
         bestNode = current;
         foundAccepting = true;
         break;
       }
 
-      // Update furthest progress for error visualization
       if (!foundAccepting && current.inputIdx > bestNode.inputIdx) {
         bestNode = current;
       }
 
-      // Try transitions
-      const currentSymbol = current.inputIdx < this.input.length ? this.input[current.inputIdx] : null;
+      const currentSymbol =
+        current.inputIdx < this.input.length
+          ? this.input[current.inputIdx]
+          : null;
       const topItem = current.stack[current.stack.length - 1];
-      const topSymbol = topItem?.symbol || '';
+      const topSymbol = topItem?.symbol || this.EPSILON;
 
       this.pda.transitions.forEach((t, idx) => {
-        const inputMatches = t.input === '' || (currentSymbol !== null && t.input === currentSymbol);
-        const popMatches = t.pop === '' || t.pop === topSymbol;
+        const consumesInput = t.input !== this.EPSILON;
+        const inputMatches =
+          !consumesInput ||
+          (currentSymbol !== null && t.input === currentSymbol);
+        const readsStack = t.pop !== this.EPSILON;
+        const popMatches = !readsStack || t.pop === topSymbol;
 
         if (t.from === current.state && inputMatches && popMatches) {
-          const nextStack = [...current.stack];
-          if (t.pop !== '') {
+          // Deep copy the stack items to prevent reference shared state[cite: 3]
+          const nextStack = current.stack.map((item) => ({ ...item }));
+
+          if (readsStack && nextStack.length > 0) {
             nextStack.pop();
           }
-          if (t.push !== '') {
-            const toPush = t.push.split('').reverse();
-            for (const s of toPush) {
+
+          if (t.push !== this.EPSILON) {
+            const symbolsToPush =
+              t.push.length > 1 && !this.pda.stackAlphabet.includes(t.push)
+                ? t.push.split("").reverse()
+                : [t.push];
+
+            for (const s of symbolsToPush) {
               nextStack.push({ id: this.generateId(), symbol: s });
             }
           }
 
-          const nextIdx = t.input === '' ? current.inputIdx : current.inputIdx + 1;
+          const nextIdx = consumesInput
+            ? current.inputIdx + 1
+            : current.inputIdx;
           const nextState = t.to;
+          const stateKey = `${nextState}|${nextIdx}|${nextStack.map((i) => i.symbol).join(",")}`;
 
-          // Epsilon loop prevention
-          const stackSymbols = nextStack.map(i => i.symbol).join(',');
-          const stateKey = `${nextState}|${nextIdx}|${stackSymbols}`;
-          if (t.input === '' && visited.has(stateKey)) return;
-          if (t.input === '') visited.add(stateKey);
+          if (visited.has(stateKey)) return;
+          visited.add(stateKey);
 
           queue.push({
             state: nextState,
@@ -110,13 +124,12 @@ export class PDASimulator {
             inputIdx: nextIdx,
             lastTransitionIdx: idx,
             parent: current,
-            historyLog: `Read '${t.input || 'ε'}', Pop '${t.pop || 'ε'}', Push '${t.push || 'ε'}' -> state ${nextState}`
+            historyLog: `Read '${t.input || "ε"}', Pop '${t.pop || "ε"}', Push '${t.push || "ε"}' -> state ${nextState}`,
           });
         }
       });
     }
 
-    // Reconstruct path
     const nodes: SearchNode[] = [];
     let curr: SearchNode | null = bestNode;
     while (curr) {
@@ -126,12 +139,23 @@ export class PDASimulator {
 
     this.path = nodes.map((node, i) => ({
       stateId: node.state,
-      stack: node.stack,
+      // Create a unique array reference for React's reconciliation[cite: 3]
+      stack: node.stack.map((item) => ({ ...item })),
       inputIdx: node.inputIdx,
       lastTransitionIdx: node.lastTransitionIdx,
-      history: nodes.slice(0, i + 1).map(n => n.historyLog)
+      history: nodes.slice(0, i + 1).map((n) => n.historyLog),
     }));
-    this.currentStepIdx = 0;
+  }
+
+  hasEpsilonTransition(): boolean {
+    if (this.currentStepIdx + 1 < this.path.length) {
+      const nextStep = this.path[this.currentStepIdx + 1];
+      return (
+        this.pda.transitions[nextStep.lastTransitionIdx!]?.input ===
+        this.EPSILON
+      );
+    }
+    return false;
   }
 
   step(): boolean {
@@ -142,40 +166,29 @@ export class PDASimulator {
     return false;
   }
 
-  getCurrentStateId(): string {
+  getCurrentStateId() {
     return this.path[this.currentStepIdx].stateId;
   }
-
-  getStack(): StackItem[] {
-    return [...this.path[this.currentStepIdx].stack];
+  getStack() {
+    return this.path[this.currentStepIdx].stack;
   }
-
-  getCurrentIndex(): number {
+  getCurrentIndex() {
     return this.path[this.currentStepIdx].inputIdx;
   }
-
-  getHistory(): string[] {
+  getHistory() {
     return this.path[this.currentStepIdx].history;
   }
-
-  getLastTransitionIdx(): number | null {
+  getLastTransitionIdx() {
     return this.path[this.currentStepIdx].lastTransitionIdx;
   }
-
-  isFinished(): boolean {
+  isFinished() {
     return this.currentStepIdx >= this.path.length - 1;
   }
-
-  isAccepted(): boolean {
-    const current = this.path[this.currentStepIdx];
-    return current.inputIdx === this.input.length && this.pda.acceptStates.includes(current.stateId);
-  }
-
-  hasEpsilonTransition(): boolean {
-    return false; 
-  }
-
-  reset() {
-    this.currentStepIdx = 0;
+  isAccepted() {
+    const curr = this.path[this.currentStepIdx];
+    return (
+      curr.inputIdx === this.input.length &&
+      this.pda.acceptStates.includes(curr.stateId)
+    );
   }
 }
