@@ -17,7 +17,14 @@ export default function Controller() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 font-sans selection:bg-indigo-500/30">
+    <div className="min-h-screen bg-[image:var(--image-sunset)] bg-cover bg-center bg-fixed text-slate-200">
+      {/* 
+         IMPORTANT: Add this next line to create a dark tint. 
+         Without this, your white text will be impossible to read against the bright sunset.
+      */}
+      <div className="min-h-screen bg-slate-550/50 backdrop-blur-[1px]">
+      
+
       <header className="border-b border-slate-900 bg-slate-950/80 backdrop-blur-md sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -25,8 +32,8 @@ export default function Controller() {
               Σ
             </div>
             <div>
-              <h1 className="text-xl font-bold tracking-tight text-white uppercase leading-none mb-1">
-                Automata <span className="text-indigo-400 font-normal">Compiler</span>
+              <h1 className="text-4xl font-minecraft text-white uppercase leading-none mb-1">
+                Automata <span className="text-indigo-400">Compiler</span>
               </h1>
               <p className="text-[10px] text-slate-500 font-mono tracking-widest uppercase">
                 DFA • PDA • CFG Processor
@@ -41,7 +48,7 @@ export default function Controller() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 px-6 py-2 rounded-full text-xs font-bold transition-all uppercase tracking-wider ${
+                   className={`flex items-center gap-2 px-6 py-2 rounded-full text-base font-minecraft transition-all uppercase tracking-widest ${
                     activeTab === tab.id
                       ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30'
                       : 'text-slate-500 hover:text-slate-200 hover:bg-slate-800'
@@ -86,6 +93,7 @@ export default function Controller() {
           <span>© 2026 Formal Systems Lab</span>
         </div>
       </footer>
+    </div>
     </div>
   );
 }

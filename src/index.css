@@ -1,1 +1,13 @@
 @import "tailwindcss";
+
+@font-face {
+  font-family: 'MinecraftFont';
+  src: url('./fonts/minecraft.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@theme {
+  --font-minecraft: "MinecraftFont", sans-serif;
+  --image-sunset: url('./images/mine-sunset.webp');
+}
