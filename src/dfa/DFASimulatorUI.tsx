@@ -31,6 +31,22 @@ export default function DFASimulatorUI() {
   const simulatorRef = useRef<DFASimulator | null>(null);
   const dfa = DFA_EXAMPLES[selectedDfaKey];
 
+  const DFA_SAMPLE_STRINGS: Record<
+    keyof typeof DFA_EXAMPLES,
+    { valid: string[]; invalid: string[] }
+  > = {
+    dfa1: {
+      valid: ["00110101101", "1111010111", "00111110101"],
+      invalid: ["0011010", "1111010", "00111110"],
+    },
+    dfa2: {
+      valid: ["babbabaaaabbaa", "bbabaaaaaabaaabb", "bbabbbbbbbabbbaa"],
+      invalid: ["aba", "abab", "bbb"],
+    },
+  };
+
+  const currentSamples = DFA_SAMPLE_STRINGS[selectedDfaKey];
+
   useEffect(() => {
     const trimmed = regexInput.trim();
     if (trimmed === REGEX_1) {
@@ -160,6 +176,44 @@ export default function DFASimulatorUI() {
               />
               <Terminal className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-700" />
             </div>
+
+            <div className="mt-6 grid gap-4">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-3">
+                  Valid examples
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {currentSamples.valid.map((sample) => (
+                    <button
+                      key={sample}
+                      type="button"
+                      onClick={() => setInputString(sample)}
+                      className="rounded-2xl border border-emerald-500/30 px-3 py-2 text-xs font-mono text-emerald-300 hover:bg-emerald-500/10 transition"
+                    >
+                      {sample}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-3">
+                  Invalid examples
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {currentSamples.invalid.map((sample) => (
+                    <button
+                      key={sample}
+                      type="button"
+                      onClick={() => setInputString(sample)}
+                      className="rounded-2xl border border-rose-500/30 px-3 py-2 text-xs font-mono text-rose-300 hover:bg-rose-500/10 transition"
+                    >
+                      {sample}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -174,13 +228,13 @@ export default function DFASimulatorUI() {
           <button
             onClick={step}
             disabled={isFinished}
-            className="w-14 h-14 bg-slate-800 hover:bg-slate-700 text-white rounded-full flex items-center justify-center disabled:opacity-30 transition-all border border-slate-700"
+            className="bg-slate-800 text-white rounded-full p-3 border border-slate-700 transition-all hover:bg-slate-700 disabled:opacity-30"
           >
             <StepForward className="w-5 h-5" />
           </button>
           <button
             onClick={reset}
-            className="w-14 h-14 bg-slate-800 hover:bg-slate-700 text-white rounded-full flex items-center justify-center transition-all border border-slate-700"
+            className="bg-slate-800 text-white rounded-full p-3 border border-slate-700 transition-all hover:bg-slate-700"
           >
             <RotateCcw className="w-5 h-5" />
           </button>

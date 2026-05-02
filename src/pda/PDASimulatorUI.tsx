@@ -98,6 +98,26 @@ export default function PDASimulatorUI() {
   const isRunningRef = useRef(false);
   const pda = PDA_EXAMPLES[selectedPdaKey];
 
+  const PDA_SAMPLE_STRINGS: Record<
+    keyof typeof PDA_EXAMPLES,
+    { valid: string[]; invalid: string[] }
+  > = {
+    pda1: {
+      valid: ["00110101101", "1111010111", "00111110101"],
+      invalid: ["0011010", "1111010", "00111110"],
+    },
+    pda2: {
+      valid: ["babbabaaaabbaa", "bbabaaaaaabaaabb", "bbabbbbbbbabbbaa"],
+      invalid: ["aba", "abab", "bbb"],
+    },
+    pda3: {
+      valid: ["000111", "00001111", "001111"],
+      invalid: ["00111", "00011", "011"],
+    },
+  };
+
+  const currentSamples = PDA_SAMPLE_STRINGS[selectedPdaKey];
+
   // Sync Regex Selection
   useEffect(() => {
     const trimmed = regexInput.trim();
@@ -236,30 +256,42 @@ export default function PDASimulatorUI() {
                 />
                 <Terminal className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-700" />
               </div>
+            </div>
 
-              <div className="mt-4">
-                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-2 tracking-widest">
-                  Sample Test Strings
-                </label>
-                <div className="grid grid-cols-3 gap-2">
-                  <button
-                    onClick={() => setInputString("110101")}
-                    className="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-mono py-2 px-3 rounded-lg border border-slate-700 transition-all"
-                  >
-                    110101
-                  </button>
-                  <button
-                    onClick={() => setInputString("10101")}
-                    className="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-mono py-2 px-3 rounded-lg border border-slate-700 transition-all"
-                  >
-                    10101
-                  </button>
-                  <button
-                    onClick={() => setInputString("011010")}
-                    className="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-mono py-2 px-3 rounded-lg border border-slate-700 transition-all"
-                  >
-                    011010
-                  </button>
+            <div className="mt-6 grid gap-4">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-3">
+                  Valid examples
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {currentSamples.valid.map((sample) => (
+                    <button
+                      key={sample}
+                      type="button"
+                      onClick={() => setInputString(sample)}
+                      className="rounded-2xl border border-emerald-500/30 px-3 py-2 text-xs font-mono text-emerald-300 hover:bg-emerald-500/10 transition"
+                    >
+                      {sample}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-3">
+                  Invalid examples
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {currentSamples.invalid.map((sample) => (
+                    <button
+                      key={sample}
+                      type="button"
+                      onClick={() => setInputString(sample)}
+                      className="rounded-2xl border border-rose-500/30 px-3 py-2 text-xs font-mono text-rose-300 hover:bg-rose-500/10 transition"
+                    >
+                      {sample}
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>
