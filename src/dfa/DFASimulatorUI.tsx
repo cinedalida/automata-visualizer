@@ -19,7 +19,9 @@ export default function DFASimulatorUI() {
   const [selectedDfaKey, setSelectedDfaKey] =
     useState<keyof typeof DFA_EXAMPLES>("dfa1");
   const [isValidRegex, setIsValidRegex] = useState(true);
-  const [inputString, setInputString] = useState("110101");
+
+  // CHANGED: default input matches dfa1 alphabet and is a valid string
+  const [inputString, setInputString] = useState("111111");
   const [currentStateId, setCurrentStateId] = useState("");
   const [activeTransitionIdx, setActiveTransitionIdx] = useState<
     number | undefined
@@ -31,17 +33,40 @@ export default function DFASimulatorUI() {
   const simulatorRef = useRef<DFASimulator | null>(null);
   const dfa = DFA_EXAMPLES[selectedDfaKey];
 
+  // ============================================================
+  // Sample strings matching the corrected DFAs
+  // ============================================================
   const DFA_SAMPLE_STRINGS: Record<
     keyof typeof DFA_EXAMPLES,
     { valid: string[]; invalid: string[] }
   > = {
     dfa1: {
-      valid: ["00110101101", "1111010111", "00111110101"],
-      invalid: ["0011010", "1111010", "00111110"],
+      valid: [
+        "111111", // 11(double) + 1(bridge) + 111(pattern)
+        "0011010", // 00(double) + 1(bridge) + 101(pattern) + 0(tail)
+        "1111010", // 11(double) + 1(bridge) + 101(pattern) + 0(tail)
+        "00111110", // 00(double) + 1(bridge) + 111(pattern) + 10(tail)
+      ],
+      invalid: [
+        "11111", // too short, pattern incomplete
+        "00111", // too short, pattern incomplete
+        "010101010101", // no double (00 or 11)
+        "1100000000", // no pattern (101 or 111)
+      ],
     },
     dfa2: {
-      valid: ["babbabaaaabbaa", "bbabaaaaaabaaabb", "bbabbbbbbbabbbaa"],
-      invalid: ["aba", "abab", "bbb"],
+      valid: [
+        "babababbb", // bab(L1) + a(L2) + bab(L3) + bb(tail)
+        "babaabbaa", // bab(L1) + a(L2) + aba(L3) + ...aa(tail)
+        "ababaaa", // a(L2) + bab(L3) + aa(tail)
+        "aabaabb", // a(L2) + aba(L3) + bb(tail)
+      ],
+      invalid: [
+        "baabaaa", // baa triggers trap at q4
+        "babababa", // ends in a, tail requires aa or bb
+        "baba", // too short, missing pattern
+        "aaaa", // no valid bab/aba pattern
+      ],
     },
   };
 
@@ -60,8 +85,15 @@ export default function DFASimulatorUI() {
     }
   }, [regexInput]);
 
+  // ============================================================
+  // Reset AND set a sensible default input per DFA
+  // ============================================================
   useEffect(() => {
-    reset();
+    if (selectedDfaKey === "dfa1") {
+      setInputString("111111");
+    } else {
+      setInputString("ababaaa");
+    }
   }, [selectedDfaKey]);
 
   const isRunningRef = useRef(false);
@@ -99,7 +131,6 @@ export default function DFASimulatorUI() {
 
   const run = async () => {
     if (isRunningRef.current || isFinished) return;
-
     isRunningRef.current = true;
 
     while (
@@ -115,12 +146,20 @@ export default function DFASimulatorUI() {
     isRunningRef.current = false;
   };
 
+  // ============================================================
+  // Filter input based on the current DFA's alphabet
+  // dfa1 → only '0' and '1'
+  // dfa2 → only 'a' and 'b'
+  // ============================================================
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value.replace(/[^0-1a-b]/g, ""); // Filter based on actual alphabet ideally
-    setInputString(val);
+    const allowed = dfa.alphabet;
+    const filtered = e.target.value
+      .split("")
+      .filter((ch) => allowed.includes(ch))
+      .join("");
+    setInputString(filtered);
   };
 
-  // Re-init simulator when input string changes but we are at step 0
   useEffect(() => {
     reset();
   }, [inputString]);
@@ -165,13 +204,17 @@ export default function DFASimulatorUI() {
 
             <label className="block text-[10px] font-bold text-slate-600 uppercase mb-3 tracking-widest">
               Test String
+              {/* ADDED: Show which characters are allowed */}
+              <span className="ml-2 text-slate-700 normal-case font-mono">
+                (allowed: {dfa.alphabet.join(", ")})
+              </span>
             </label>
             <div className="relative">
               <input
                 type="text"
                 value={inputString}
                 onChange={handleInputChange}
-                placeholder="Enter sequence..."
+                placeholder={`Enter ${dfa.alphabet.join("/")} sequence...`}
                 className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-all font-mono text-indigo-300 text-lg tracking-widest"
               />
               <Terminal className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-700" />
@@ -248,6 +291,16 @@ export default function DFASimulatorUI() {
             State Visualization
           </h3>
         </div>
+
+        {/* Current state badge */}
+        {currentStateId && (
+          <div className="absolute top-6 right-6 z-10">
+            <span className="text-[10px] bg-slate-800 px-2 py-0.5 rounded text-indigo-400 font-mono">
+              CURRENT: {currentStateId}
+            </span>
+          </div>
+        )}
+
         <div className="flex items-center justify-center h-full">
           {isValidRegex ? (
             <D3Graph
@@ -278,6 +331,14 @@ export default function DFASimulatorUI() {
           <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 font-mono text-[11px] leading-relaxed">
             <p className="text-slate-500 mb-2">Initialize DFA processor...</p>
             <p className="text-indigo-400">δ(q_start, Σ) {"->"} q_next</p>
+
+            {/* Show the alphabet for this DFA */}
+            <p className="text-slate-600 mt-1 mb-4">
+              Σ = {"{"}
+              {dfa.alphabet.join(", ")}
+              {"}"}
+            </p>
+
             <div className="mt-4 space-y-1">
               {inputString.split("").map((char, idx) => (
                 <p
@@ -360,9 +421,31 @@ export default function DFASimulatorUI() {
           </h3>
           <p className="font-mono text-sm text-indigo-300 leading-relaxed max-w-2xl">
             {selectedDfaKey === "dfa1"
-              ? "(1+0)* (11+00) (00+11)* (1+0+11) (1+0+11)* (101+111) (101+111)* (1+0 *+11) (1+0* +11 ) *"
+              ? "(1+0)* (11+00) (00+11)* (1+0+11) (1+0+11)* (101+111) (101+111)* (1+0*+11) (1+0*+11)*"
               : "(bab)* (b+a) (bab+aba) (a+b)* (aa+bb)* (b+a+bb) (a+b)* (aa+bb)"}
           </p>
+
+          {/* DFA stats summary */}
+          <div className="flex gap-4 mt-3">
+            <span className="text-[10px] text-slate-600 font-mono">
+              States: {dfa.states.length}
+            </span>
+            <span className="text-[10px] text-slate-600 font-mono">
+              Alphabet: {"{"}
+              {dfa.alphabet.join(", ")}
+              {"}"}
+            </span>
+            <span className="text-[10px] text-slate-600 font-mono">
+              Transitions: {dfa.transitions.length}
+            </span>
+            <span className="text-[10px] text-slate-600 font-mono">
+              Accept:{" "}
+              {dfa.states
+                .filter((s) => s.isAccept)
+                .map((s) => s.id)
+                .join(", ")}
+            </span>
+          </div>
         </div>
       </div>
     </div>
