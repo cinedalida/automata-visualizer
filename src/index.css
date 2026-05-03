@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+<<<<<<< HEAD
 @font-face {
   font-family: 'MinecraftFont';
   src: url('./fonts/minecraft.ttf') format('truetype');
@@ -10,4 +11,34 @@
 @theme {
   --font-minecraft: "MinecraftFont", sans-serif;
   --image-sunset: url('./images/mine-sunset.webp');
+=======
+/* Compiler-themed scrollbars for internal scroll containers */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(79, 70, 229, 0.75) rgba(15, 23, 42, 0.85);
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.85);
+  border-radius: 9999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(79, 70, 229, 0.75);
+  border-radius: 9999px;
+  border: 2px solid rgba(15, 23, 42, 0.85);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(79, 70, 229, 0.95);
+}
+
+.custom-scrollbar::-webkit-scrollbar-corner {
+  background: transparent;
+>>>>>>> origin/main
 }

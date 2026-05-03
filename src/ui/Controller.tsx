@@ -1,19 +1,27 @@
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { Play, StepForward, RotateCcw, Settings, Terminal, Activity, Layers } from 'lucide-react';
-import DFASimulatorUI from '../dfa/DFASimulatorUI';
-import PDASimulatorUI from '../pda/PDASimulatorUI';
-import CFGSimulatorUI from '../cfg/CFGSimulatorUI';
+import { useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import {
+  Play,
+  StepForward,
+  RotateCcw,
+  Settings,
+  Terminal,
+  Activity,
+  Layers,
+} from "lucide-react";
+import DFASimulatorUI from "../dfa/DFASimulatorUI";
+import PDASimulatorUI from "../pda/PDASimulatorUI";
+import CFGSimulatorUI from "../cfg/CFGSimulatorUI";
 
-type Tab = 'DFA' | 'PDA' | 'CFG';
+type Tab = "DFA" | "PDA" | "CFG";
 
 export default function Controller() {
-  const [activeTab, setActiveTab] = useState<Tab>('DFA');
+  const [activeTab, setActiveTab] = useState<Tab>("DFA");
 
   const tabs: { id: Tab; label: string; icon: any }[] = [
-    { id: 'DFA', label: 'DFA Visualizer', icon: Activity },
-    { id: 'PDA', label: 'PDA Simulator', icon: Layers },
-    { id: 'CFG', label: 'CFG Compiler', icon: Terminal },
+    { id: "DFA", label: "DFA Visualizer", icon: Activity },
+    { id: "PDA", label: "PDA Simulator", icon: Layers },
+    { id: "CFG", label: "CFG Compiler", icon: Terminal },
   ];
 
   return (
@@ -26,21 +34,27 @@ export default function Controller() {
       
 
       <header className="border-b border-slate-900 bg-slate-950/80 backdrop-blur-md sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between gap-6">
           <div className="flex items-center gap-4">
             <div className="h-10 w-10 bg-indigo-600 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/20">
               Σ
             </div>
             <div>
+<<<<<<< HEAD
               <h1 className="text-4xl font-minecraft text-white uppercase leading-none mb-1">
                 Automata <span className="text-indigo-400">Compiler</span>
+=======
+              <h1 className="text-xl font-bold tracking-tight text-white uppercase leading-none mb-1">
+                Automata{" "}
+                <span className="text-indigo-400 font-normal">Compiler</span>
+>>>>>>> origin/main
               </h1>
               <p className="text-[10px] text-slate-500 font-mono tracking-widest uppercase">
                 DFA • PDA • CFG Processor
               </p>
             </div>
           </div>
-          
+
           <nav className="flex gap-2 bg-slate-900/50 p-1.5 rounded-full border border-slate-800">
             {tabs.map((tab) => {
               const Icon = tab.icon;
@@ -50,8 +64,8 @@ export default function Controller() {
                   onClick={() => setActiveTab(tab.id)}
                    className={`flex items-center gap-2 px-6 py-2 rounded-full text-base font-minecraft transition-all uppercase tracking-widest ${
                     activeTab === tab.id
-                      ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30'
-                      : 'text-slate-500 hover:text-slate-200 hover:bg-slate-800'
+                      ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/30"
+                      : "text-slate-500 hover:text-slate-200 hover:bg-slate-800"
                   }`}
                   id={`tab-${tab.id.toLowerCase()}`}
                 >
@@ -65,24 +79,26 @@ export default function Controller() {
           <div className="hidden lg:flex items-center gap-3">
             <div className="bg-slate-900 border border-slate-800 px-4 py-2 rounded-full flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-              <span className="text-[10px] font-mono text-emerald-400 uppercase tracking-tight">System Ready</span>
+              <span className="text-[10px] font-mono text-emerald-400 uppercase tracking-tight">
+                System Ready
+              </span>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 py-8">
+      <main className="max-w-7xl mx-auto px-6 py-10">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.98 }}
-            transition={{ duration: 0.3, ease: 'easeOut' }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
           >
-            {activeTab === 'DFA' && <DFASimulatorUI />}
-            {activeTab === 'PDA' && <PDASimulatorUI />}
-            {activeTab === 'CFG' && <CFGSimulatorUI />}
+            {activeTab === "DFA" && <DFASimulatorUI />}
+            {activeTab === "PDA" && <PDASimulatorUI />}
+            {activeTab === "CFG" && <CFGSimulatorUI />}
           </motion.div>
         </AnimatePresence>
       </main>

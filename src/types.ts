@@ -1,4 +1,3 @@
-
 export interface Point {
   x: number;
   y: number;
@@ -11,6 +10,7 @@ export interface State {
   y?: number;
   isAccept: boolean;
   isStart: boolean;
+  shape?: "circle" | "diamond" | "rounded";
 }
 
 export interface Transition {
@@ -31,8 +31,8 @@ export interface PDATransition {
   from: string;
   to: string;
   input: string; // ε can be represented as ''
-  pop: string;   // ε can be represented as ''
-  push: string;  // ε can be represented as ''
+  pop: string; // ε can be represented as ''
+  push: string; // ε can be represented as ''
 }
 
 export interface PDA {
