@@ -83,7 +83,9 @@ export default function PDASimulatorUI() {
   const [selectedPdaKey, setSelectedPdaKey] =
     useState<keyof typeof PDA_EXAMPLES>("pda1");
   const [isValidRegex, setIsValidRegex] = useState(true);
-  const [inputString, setInputString] = useState("110101");
+
+  // default input matches pda1 alphabet and is a valid string
+  const [inputString, setInputString] = useState("111111");
   const [currentStateId, setCurrentStateId] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [stack, setStack] = useState<StackItem[]>([]);
@@ -98,21 +100,40 @@ export default function PDASimulatorUI() {
   const isRunningRef = useRef(false);
   const pda = PDA_EXAMPLES[selectedPdaKey];
 
+  // ============================================================
+  // Sample strings matching the corrected PDAs
+  // ============================================================
   const PDA_SAMPLE_STRINGS: Record<
     keyof typeof PDA_EXAMPLES,
     { valid: string[]; invalid: string[] }
   > = {
     pda1: {
-      valid: ["00110101101", "1111010111", "00111110101"],
-      invalid: ["0011010", "1111010", "00111110"],
+      valid: [
+        "111111", // 11(double) + 1(bridge) + 111(pattern)
+        "0011010", // 00(double) + 1(bridge) + 101(pattern) + 0(tail)
+        "1111010", // 11(double) + 1(bridge) + 101(pattern) + 0(tail)
+        "00111110", // 00(double) + 1(bridge) + 111(pattern) + 10(tail)
+      ],
+      invalid: [
+        "11111", // too short, pattern incomplete
+        "00111", // too short, pattern incomplete
+        "010101010101", // no double (00 or 11)
+        "1100000000", // no pattern (101 or 111)
+      ],
     },
     pda2: {
-      valid: ["babbabaaaabbaa", "bbabaaaaaabaaabb", "bbabbbbbbbabbbaa"],
-      invalid: ["aba", "abab", "bbb"],
-    },
-    pda3: {
-      valid: ["000111", "00001111", "001111"],
-      invalid: ["00111", "00011", "011"],
+      valid: [
+        "babababbb", // bab(L1) + a(L2) + bab(L3) + bb(tail)
+        "babaabbaa", // bab(L1) + a(L2) + aba(L3) + ...aa(tail)
+        "ababaaa", // a(L2) + bab(L3) + aa(tail)
+        "aabaabb", // a(L2) + aba(L3) + bb(tail)
+      ],
+      invalid: [
+        "baabaaa", // baa triggers trap at q4
+        "babababa", // ends in a, tail requires aa or bb
+        "baba", // too short, missing pattern
+        "aaaa", // no valid bab/aba pattern
+      ],
     },
   };
 
@@ -127,14 +148,21 @@ export default function PDASimulatorUI() {
     } else if (trimmed === REGEX_2) {
       setSelectedPdaKey("pda2");
       setIsValidRegex(true);
-    } else if (trimmed === "0^n1^n") {
-      setSelectedPdaKey("pda3");
-      setIsValidRegex(true);
-      setInputString("000111");
     } else {
       setIsValidRegex(false);
     }
   }, [regexInput]);
+
+  // ============================================================
+  // Reset AND set a sensible default input per PDA
+  // ============================================================
+  useEffect(() => {
+    if (selectedPdaKey === "pda1") {
+      setInputString("111111");
+    } else {
+      setInputString("ababaaa");
+    }
+  }, [selectedPdaKey]);
 
   // Reset Simulation State
   const reset = () => {
@@ -142,7 +170,6 @@ export default function PDASimulatorUI() {
     simulatorRef.current = new PDASimulator(pda, inputString);
     setCurrentStateId(simulatorRef.current.getCurrentStateId());
     setCurrentIndex(0);
-    // Use getStack() copy to ensure React detects state changes
     setStack([...simulatorRef.current.getStack()]);
     setHistory([...simulatorRef.current.getHistory()]);
     setActiveTransitionIdx(undefined);
@@ -162,7 +189,6 @@ export default function PDASimulatorUI() {
     if (moved) {
       setCurrentStateId(simulatorRef.current.getCurrentStateId());
       setCurrentIndex(simulatorRef.current.getCurrentIndex());
-      // Critical: Ensure stack items have unique IDs for stable keys[cite: 1, 3]
       setStack([...simulatorRef.current.getStack()]);
       setHistory([...simulatorRef.current.getHistory()]);
       setActiveTransitionIdx(
@@ -181,7 +207,7 @@ export default function PDASimulatorUI() {
     }
   };
 
-  // Automated Execution Sequence
+  // Automated Execution
   const run = async () => {
     if (isRunningRef.current || isFinished) return;
     isRunningRef.current = true;
@@ -191,7 +217,6 @@ export default function PDASimulatorUI() {
       simulatorRef.current &&
       !simulatorRef.current.isFinished()
     ) {
-      // Fast-track epsilon steps (400ms) vs input consumption (1200ms)
       const isEpsilon = simulatorRef.current.hasEpsilonTransition();
       const moved = step();
       if (!moved) break;
@@ -203,8 +228,19 @@ export default function PDASimulatorUI() {
     isRunningRef.current = false;
   };
 
-  // Trace scroll sync removed to keep browser scroll position fixed.
-  // History will update without page-level scrolling.
+  // ============================================================
+  // Filter input based on the current PDA's alphabet
+  // pda1 → only '0' and '1'
+  // pda2 → only 'a' and 'b'
+  // ============================================================
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const allowed = pda.alphabet;
+    const filtered = e.target.value
+      .split("")
+      .filter((ch) => allowed.includes(ch))
+      .join("");
+    setInputString(filtered);
+  };
 
   return (
     <div className="grid grid-cols-12 grid-rows-6 gap-6 min-h-[700px] lg:h-[calc(100vh-200px)] p-4 bg-slate-950">
@@ -234,7 +270,7 @@ export default function PDASimulatorUI() {
               >
                 <option value={REGEX_1}>
                   Problem 1: (1+0)* (11+00) (00+11)* (1+0+11) (1+0+11)*
-                  (101+111) (101+111)* (1+0 *+11) (1+0* +11 ) *
+                  (101+111) (101+111)* (1+0*+11) (1+0*+11)*
                 </option>
                 <option value={REGEX_2}>
                   Problem 2: (bab)* (b+a) (bab+aba) (a+b)* (aa+bb)* (b+a+bb)
@@ -246,12 +282,18 @@ export default function PDASimulatorUI() {
             <div>
               <label className="block text-[10px] font-bold text-slate-500 uppercase mb-2 tracking-widest">
                 Input Stream
+                {/* Show which characters are allowed */}
+                <span className="ml-2 text-slate-700 normal-case font-mono">
+                  (allowed: {pda.alphabet.join(", ")})
+                </span>
               </label>
               <div className="relative">
                 <input
                   type="text"
                   value={inputString}
-                  onChange={(e) => setInputString(e.target.value.toLowerCase())}
+                  // Use filtered input handler
+                  onChange={handleInputChange}
+                  placeholder={`Enter ${pda.alphabet.join("/")} stream...`}
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-lg font-mono text-indigo-300"
                 />
                 <Terminal className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-700" />
@@ -299,10 +341,22 @@ export default function PDASimulatorUI() {
             <div className="bg-slate-950 p-4 rounded-xl border border-slate-800/50">
               <div className="flex items-center gap-3">
                 <div
-                  className={`w-2.5 h-2.5 rounded-full ${isFinished ? (isAccepted ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" : "bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]") : "bg-indigo-500 animate-pulse"}`}
+                  className={`w-2.5 h-2.5 rounded-full ${
+                    isFinished
+                      ? isAccepted
+                        ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"
+                        : "bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]"
+                      : "bg-indigo-500 animate-pulse"
+                  }`}
                 ></div>
                 <span
-                  className={`text-[11px] font-bold tracking-widest ${isFinished ? (isAccepted ? "text-emerald-400" : "text-rose-400") : "text-indigo-400"}`}
+                  className={`text-[11px] font-bold tracking-widest ${
+                    isFinished
+                      ? isAccepted
+                        ? "text-emerald-400"
+                        : "text-rose-400"
+                      : "text-indigo-400"
+                  }`}
                 >
                   {isFinished
                     ? isAccepted
@@ -311,6 +365,18 @@ export default function PDASimulatorUI() {
                     : "SIMULATING..."}
                 </span>
               </div>
+
+              {/* Show current state and index while running */}
+              {!isFinished && currentStateId && (
+                <div className="mt-2 flex gap-4">
+                  <span className="text-[10px] text-slate-600 font-mono">
+                    state: {currentStateId}
+                  </span>
+                  <span className="text-[10px] text-slate-600 font-mono">
+                    idx: {currentIndex}/{inputString.length}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -346,6 +412,16 @@ export default function PDASimulatorUI() {
             State Visualization
           </h3>
         </div>
+
+        {/* Current state badge */}
+        {currentStateId && (
+          <div className="absolute top-6 right-6 z-10">
+            <span className="text-[10px] bg-slate-800 px-2 py-0.5 rounded text-indigo-400 font-mono">
+              CURRENT: {currentStateId}
+            </span>
+          </div>
+        )}
+
         <D3Graph
           states={pda.states}
           transitions={pda.transitions.map((t) => ({
@@ -360,39 +436,55 @@ export default function PDASimulatorUI() {
         />
       </div>
 
-      {/* Vertical Layered Stack Section - Matches Image Style */}
+      {/* Stack View Section */}
       <div className="col-span-12 lg:col-span-4 lg:row-span-3 h-full min-h-0 bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col overflow-hidden shadow-xl">
-        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">
-          Stack View
-        </h3>
+        <div className="flex items-center justify-between mb-4 shrink-0">
+          <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">
+            Stack View
+          </h3>
+          {/* Stack depth counter */}
+          <span className="text-[10px] bg-slate-800 px-2 py-0.5 rounded text-indigo-400 font-mono">
+            DEPTH: {stack.length}
+          </span>
+        </div>
         <StackView stack={stack} bottomLabel="BOTTOM ($)" />
       </div>
 
       {/* Operational Trace Section */}
       <div className="col-span-12 lg:col-span-8 lg:row-span-2 bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col overflow-hidden">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-4 shrink-0">
           <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">
             Operational Trace
           </h3>
+          {/* Step counter */}
+          <span className="text-[10px] text-slate-600 font-mono">
+            {history.length} steps
+          </span>
         </div>
         <div className="font-mono text-[11px] space-y-1.5 flex-grow overflow-y-auto pr-4 custom-scrollbar">
-          {history.map((log, idx) => (
-            <motion.p
-              key={idx}
-              initial={{ x: -10, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              className={
-                idx === history.length - 1
-                  ? "text-indigo-400 font-bold"
-                  : "text-slate-500"
-              }
-            >
-              <span className="opacity-30 mr-2">
-                [{idx.toString().padStart(2, "0")}]
-              </span>{" "}
-              {log}
-            </motion.p>
-          ))}
+          {history.length === 0 ? (
+            <p className="text-slate-700 uppercase tracking-widest text-[10px]">
+              Waiting for input stream...
+            </p>
+          ) : (
+            history.map((log, idx) => (
+              <motion.p
+                key={idx}
+                initial={{ x: -10, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                className={
+                  idx === history.length - 1
+                    ? "text-indigo-400 font-bold"
+                    : "text-slate-500"
+                }
+              >
+                <span className="opacity-30 mr-2">
+                  [{idx.toString().padStart(2, "0")}]
+                </span>{" "}
+                {log}
+              </motion.p>
+            ))
+          )}
         </div>
       </div>
     </div>
