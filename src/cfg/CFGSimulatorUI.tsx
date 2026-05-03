@@ -277,7 +277,7 @@ export default function CFGSimulatorUI() {
           <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-6">
             Formal Grammar (G)
           </h3>
-          <div className="h-[520px] min-h-0 overflow-y-scroll pr-2 custom-scrollbar">
+          <div className="h-full min-h-0 overflow-y-auto pr-2 custom-scrollbar">
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
               {isValidRegex ? (
                 Object.entries(cfg.productions).map(([v, prods]) => (
