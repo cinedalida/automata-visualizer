@@ -18,23 +18,46 @@ export default function CFGSimulatorUI() {
   const [selectedCfgKey, setSelectedCfgKey] =
     useState<keyof typeof CFG_EXAMPLES>("cfg1");
   const [isValidRegex, setIsValidRegex] = useState(true);
-  const [inputString, setInputString] = useState("110101");
+  const [inputString, setInputString] = useState("111111"); // CHANGED: valid default
   const [result, setResult] = useState<DerivationResult | null>(null);
   const [isValidating, setIsValidating] = useState(false);
 
   const cfg = CFG_EXAMPLES[selectedCfgKey];
 
+  // ============================================================
+  // Sample strings that match the corrected DFAs/CFGs
+  // ============================================================
   const CFG_SAMPLE_STRINGS: Record<
     keyof typeof CFG_EXAMPLES,
     { valid: string[]; invalid: string[] }
   > = {
     cfg1: {
-      valid: ["00110101101", "1111010111", "00111110101"],
-      invalid: ["0011010", "1111010", "00111110"],
+      valid: [
+        "111111", // 11(double) 1(bridge) 111(pattern)
+        "0011010", // 00(double) 1(bridge) 101(pattern) 0(tail)
+        "1111010", // 11(double) 1(bridge) 101(pattern) 0(tail)
+        "00111110", // 00(double) 1(bridge) 111(pattern) 10(tail)
+      ],
+      invalid: [
+        "11111", // too short, pattern incomplete
+        "00111", // too short, pattern incomplete
+        "010101010101", // no double (00 or 11) found
+        "1100000000", // no pattern (101 or 111) found
+      ],
     },
     cfg2: {
-      valid: ["babbabaaaabbaa", "bbabaaaaaabaaabb", "bbabbbbbbbabbbaa"],
-      invalid: ["aba", "abab", "bbb"],
+      valid: [
+        "babababbb", // bab(L1) a(L2) bab(L3) bb(tail)
+        "babaabbaa", // bab(L1) a(L2) aba(L3) ...aa(tail)
+        "ababaaa", // a(L2) bab(L3) aa(tail)
+        "aabaabb", // a(L2) aba(L3) bb(tail)
+      ],
+      invalid: [
+        "baabaaa", // baa triggers trap at q4
+        "babababa", // ends in a, tail requires aa or bb
+        "baba", // too short, missing pattern
+        "aaaa", // no valid bab/aba pattern
+      ],
     },
   };
 
@@ -53,9 +76,37 @@ export default function CFGSimulatorUI() {
     }
   }, [regexInput]);
 
+  // ============================================================
+  // Reset input string when switching CFG
+  // ============================================================
   useEffect(() => {
     setResult(null);
+    // Set a sensible default input for each CFG
+    if (selectedCfgKey === "cfg1") {
+      setInputString("111111");
+    } else {
+      setInputString("ababaaa");
+    }
   }, [selectedCfgKey]);
+
+  // ============================================================
+  // Get valid characters for current CFG
+  // ============================================================
+  const getAllowedChars = (): string[] => {
+    return cfg.terminals;
+  };
+
+  // ============================================================
+  // Filter input to only allow valid terminal symbols
+  // ============================================================
+  const handleInputChange = (value: string) => {
+    const allowed = getAllowedChars();
+    const filtered = value
+      .split("")
+      .filter((ch) => allowed.includes(ch))
+      .join("");
+    setInputString(filtered);
+  };
 
   const validate = () => {
     if (!isValidRegex) return;
@@ -113,13 +164,18 @@ export default function CFGSimulatorUI() {
 
             <label className="block text-[10px] font-bold text-slate-600 uppercase mb-3 tracking-widest">
               Source String
+              {/* Show which characters are allowed */}
+              <span className="ml-2 text-slate-700 normal-case">
+                (allowed: {cfg.terminals.join(", ")})
+              </span>
             </label>
             <div className="relative">
               <input
                 type="text"
                 value={inputString}
-                onChange={(e) => setInputString(e.target.value.toLowerCase())}
-                placeholder="Enter string..."
+                // Use filtered input handler
+                onChange={(e) => handleInputChange(e.target.value)}
+                placeholder={`Enter ${cfg.terminals.join("/")} string...`}
                 className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-emerald-600 transition-all font-mono text-emerald-400 text-lg tracking-widest"
               />
               <button
@@ -198,17 +254,17 @@ export default function CFGSimulatorUI() {
           </div>
         </div>
 
+        {/* UPDATED: Footer message matches new engine settings */}
         <div className="mt-8 pt-6 border-t border-slate-800/50">
           <p className="text-[10px] text-slate-600 leading-relaxed font-mono italic">
-            [SYS] Performing BFS sentential form expansion... Max depth 1000
-            nodes.
+            [SYS] Performing BFS sentential form expansion... Max depth 50000
+            nodes. Variables sorted by length for multi-char safety.
           </p>
         </div>
       </div>
 
       {/* Grammar Rules Bento Box */}
       <div className="col-span-12 lg:col-span-8 lg:row-span-3 bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl relative overflow-hidden">
-        {/* Background Grid */}
         <div
           className="absolute inset-0 opacity-[0.02] pointer-events-none z-0"
           style={{
@@ -233,7 +289,8 @@ export default function CFGSimulatorUI() {
                       {v}
                     </span>
                     <div className="font-mono text-sm text-slate-300">
-                      {prods.join(" | ")}
+                      {/* UPDATED: Display empty productions as ε */}
+                      {prods.map((p) => (p === "" ? "ε" : p)).join(" | ")}
                     </div>
                   </div>
                 ))
@@ -253,6 +310,12 @@ export default function CFGSimulatorUI() {
           <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">
             Derivation Steps
           </h3>
+          {/* Show step count when result exists */}
+          {result?.isAccepted && (
+            <span className="text-[10px] text-emerald-400 font-mono">
+              {result.steps.length} steps
+            </span>
+          )}
           <ClipboardList className="w-4 h-4 text-slate-600" />
         </div>
 
@@ -283,7 +346,13 @@ export default function CFGSimulatorUI() {
                   </div>
                   <div className="flex-grow h-[1px] bg-slate-800 group-hover:bg-emerald-500/30 transition-colors"></div>
                   <div
-                    className={`font-mono text-sm px-3 py-1 rounded bg-slate-950/50 border border-slate-800/50 ${idx === result.steps.length - 1 ? "text-emerald-400 font-bold border-emerald-500/20" : "text-slate-400"}`}
+                    className={`font-mono text-sm px-3 py-1 rounded bg-slate-950/50 border border-slate-800/50 ${
+                      idx === 0
+                        ? "text-sky-400 border-sky-500/20" // Start symbol
+                        : idx === result.steps.length - 1
+                          ? "text-emerald-400 font-bold border-emerald-500/20" // Final
+                          : "text-slate-400" // Intermediate
+                    }`}
                   >
                     {step === "" ? "ε" : step}
                   </div>
@@ -326,12 +395,40 @@ export default function CFGSimulatorUI() {
               Detected Context-Free (Type 2). Ready for PDA mapping.
             </p>
           </div>
+
+          {/* Current grammar stats */}
+          <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800">
+            <h4 className="text-[10px] font-bold text-slate-500 uppercase mb-2">
+              Grammar Stats
+            </h4>
+            <div className="space-y-1">
+              <p className="text-xs text-slate-400 font-mono">
+                Variables: {cfg.variables.length}
+              </p>
+              <p className="text-xs text-slate-400 font-mono">
+                Terminals: {cfg.terminals.join(", ")}
+              </p>
+              <p className="text-xs text-slate-400 font-mono">
+                Productions:{" "}
+                {Object.values(cfg.productions).reduce(
+                  (sum, prods) => sum + prods.length,
+                  0,
+                )}
+              </p>
+              <p className="text-xs text-slate-400 font-mono">
+                Start: {cfg.startSymbol}
+              </p>
+            </div>
+          </div>
+
           <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800">
             <h4 className="text-[10px] font-bold text-slate-500 uppercase mb-2">
               Automata Parity
             </h4>
             <p className="text-xs text-slate-400 leading-relaxed">
-              Grammar matches the structural complexity of PDA Example 01.
+              Grammar matches the structural complexity of{" "}
+              {selectedCfgKey === "cfg1" ? "DFA1" : "DFA2"} with{" "}
+              {cfg.variables.length} states.
             </p>
           </div>
         </div>
