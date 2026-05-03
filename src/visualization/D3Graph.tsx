@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import { State, Transition } from "../types";
 
@@ -20,6 +20,13 @@ const D3Graph: React.FC<D3GraphProps> = ({
   height = 500,
 }) => {
   const svgRef = useRef<SVGSVGElement>(null);
+  const [zoomTransform, setZoomTransform] = useState<d3.ZoomTransform>(
+    d3.zoomIdentity,
+  );
+  const [initialTransform, setInitialTransform] = useState<d3.ZoomTransform>(
+    d3.zoomIdentity,
+  );
+  const zoomRef = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(null);
 
   useEffect(() => {
     if (!svgRef.current) return;
@@ -28,6 +35,18 @@ const D3Graph: React.FC<D3GraphProps> = ({
     svg.selectAll("*").remove();
 
     const g = svg.append("g");
+
+    // Create zoom behavior
+    const zoom = d3
+      .zoom<SVGSVGElement, unknown>()
+      .scaleExtent([0.1, 4])
+      .on("zoom", (event) => {
+        g.attr("transform", event.transform);
+        setZoomTransform(event.transform);
+      });
+
+    zoomRef.current = zoom;
+    svg.call(zoom);
 
     // Marker for arrows
     svg
@@ -296,7 +315,10 @@ const D3Graph: React.FC<D3GraphProps> = ({
     const tx = width / 2 - centerX * scale;
     const ty = height / 2 - centerY * scale;
 
-    g.attr("transform", `translate(${tx},${ty}) scale(${scale})`);
+    const initialTransform = d3.zoomIdentity.translate(tx, ty).scale(scale);
+    g.attr("transform", initialTransform.toString());
+    svg.call(zoom.transform, initialTransform);
+    setInitialTransform(initialTransform);
 
     // Update positions
     link.attr("d", (d: any) => {
@@ -354,8 +376,56 @@ const D3Graph: React.FC<D3GraphProps> = ({
     node.attr("transform", (d: any) => `translate(${d.x},${d.y})`);
   }, [states, transitions, activeStateId, activeTransitionIdx, width, height]);
 
+  const handleZoomIn = () => {
+    if (!svgRef.current || !zoomRef.current) return;
+    const svg = d3.select(svgRef.current);
+    svg.transition().duration(300).call(zoomRef.current.scaleBy, 1.5);
+  };
+
+  const handleZoomOut = () => {
+    if (!svgRef.current || !zoomRef.current) return;
+    const svg = d3.select(svgRef.current);
+    svg
+      .transition()
+      .duration(300)
+      .call(zoomRef.current.scaleBy, 1 / 1.5);
+  };
+
+  const handleResetZoom = () => {
+    if (!svgRef.current || !zoomRef.current) return;
+    const svg = d3.select(svgRef.current);
+    svg
+      .transition()
+      .duration(300)
+      .call(zoomRef.current.transform, initialTransform);
+  };
+
   return (
-    <div className="w-full h-full bg-slate-950 rounded-3xl overflow-hidden">
+    <div className="w-full h-full bg-slate-950 rounded-3xl overflow-hidden relative">
+      {/* Zoom Controls */}
+      <div className="absolute top-4 right-4 z-10 flex gap-2">
+        <button
+          onClick={handleZoomIn}
+          className="bg-slate-800 hover:bg-slate-700 text-white rounded-lg p-2 transition-colors text-sm font-bold"
+          title="Zoom In"
+        >
+          +
+        </button>
+        <button
+          onClick={handleZoomOut}
+          className="bg-slate-800 hover:bg-slate-700 text-white rounded-lg p-2 transition-colors text-sm font-bold"
+          title="Zoom Out"
+        >
+          −
+        </button>
+        <button
+          onClick={handleResetZoom}
+          className="bg-slate-800 hover:bg-slate-700 text-white rounded-lg px-3 py-2 transition-colors text-xs"
+          title="Reset Zoom"
+        >
+          Reset
+        </button>
+      </div>
       <svg
         ref={svgRef}
         width="100%"
