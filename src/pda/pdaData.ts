@@ -11,23 +11,107 @@ export const PDA_EXAMPLES: Record<string, PDA> = {
   // ============================================================
   pda1: {
     states: [
-      { id: "Q0", label: "Q0", isStart: true, isAccept: false },
-      { id: "Q1", label: "Q1", isStart: false, isAccept: false },
-      { id: "Q2", label: "Q2", isStart: false, isAccept: false },
-      { id: "Q3", label: "Q3", isStart: false, isAccept: false },
-      { id: "Q4", label: "Q4", isStart: false, isAccept: false },
-      { id: "Q5", label: "Q5", isStart: false, isAccept: false },
-      { id: "Q6", label: "Q6", isStart: false, isAccept: false },
-      { id: "Q7", label: "Q7", isStart: false, isAccept: false },
-      { id: "Q8", label: "Q8", isStart: false, isAccept: false },
-      { id: "Q9", label: "Q9", isStart: false, isAccept: true },
+      // START node (oblong/rounded square)
+      {
+        id: "START",
+        label: "START",
+        isStart: true,
+        isAccept: false,
+        shape: "rounded",
+      },
+
+      // READ nodes (diamond)
+      {
+        id: "Q0",
+        label: "READ",
+        isStart: false,
+        isAccept: false,
+        shape: "diamond",
+      },
+      {
+        id: "Q1",
+        label: "READ",
+        isStart: false,
+        isAccept: false,
+        shape: "diamond",
+      },
+      {
+        id: "Q2",
+        label: "READ",
+        isStart: false,
+        isAccept: false,
+        shape: "diamond",
+      },
+      {
+        id: "Q3",
+        label: "READ",
+        isStart: false,
+        isAccept: false,
+        shape: "diamond",
+      },
+      {
+        id: "Q4",
+        label: "READ",
+        isStart: false,
+        isAccept: false,
+        shape: "diamond",
+      },
+      {
+        id: "Q5",
+        label: "READ",
+        isStart: false,
+        isAccept: false,
+        shape: "diamond",
+      },
+      {
+        id: "Q6",
+        label: "READ",
+        isStart: false,
+        isAccept: false,
+        shape: "diamond",
+      },
+      {
+        id: "Q7",
+        label: "READ",
+        isStart: false,
+        isAccept: false,
+        shape: "diamond",
+      },
+      {
+        id: "Q8",
+        label: "READ",
+        isStart: false,
+        isAccept: false,
+        shape: "diamond",
+      },
+      {
+        id: "Q9",
+        label: "READ",
+        isStart: false,
+        isAccept: false,
+        shape: "diamond",
+      },
+
+      // ACCEPT node (oblong/rounded square)
+      {
+        id: "ACCEPT",
+        label: "ACCEPT",
+        isStart: false,
+        isAccept: true,
+        shape: "rounded",
+      },
     ],
     alphabet: ["0", "1"],
     stackAlphabet: ["Z0", "0", "1"],
-    startState: "Q0",
+    startState: "START",
     startStackSymbol: "Z0",
-    acceptStates: ["Q9"],
+    acceptStates: ["ACCEPT"],
     transitions: [
+      // --------------------------------------------------------
+      // START → Q0 (epsilon transition)
+      // --------------------------------------------------------
+      { from: "START", to: "Q0", input: "", pop: "", push: "" },
+
       // --------------------------------------------------------
       // Layer 1: Find 00 or 11
       // --------------------------------------------------------
@@ -68,47 +152,173 @@ export const PDA_EXAMPLES: Record<string, PDA> = {
       { from: "Q8", to: "Q9", input: "1", pop: "", push: "1" },
 
       // --------------------------------------------------------
-      // Accept state: absorb remaining input
+      // Layer 5: Accept state, absorb remaining tail
       // --------------------------------------------------------
       { from: "Q9", to: "Q9", input: "0", pop: "", push: "0" },
       { from: "Q9", to: "Q9", input: "1", pop: "", push: "1" },
+
+      // --------------------------------------------------------
+      // Q9 → ACCEPT (epsilon transition)
+      // --------------------------------------------------------
+      { from: "Q9", to: "ACCEPT", input: "", pop: "", push: "" },
     ],
   },
 
   // ============================================================
-  // PDA2: Mirrors corrected DFA2
-  // Regex: (bab)* (b+a) (bab+aba) (a+b)* (aa+bb)* (b+a+bb)
-  //        (a+b)* (aa+bb)
-  // Alphabet: {a, b}
-  // Stack: push-only (records input history)
-  // Accept states: q14, q15
+  // PDA2
   // ============================================================
   pda2: {
     states: [
-      { id: "q0", label: "q0", isStart: true, isAccept: false },
-      { id: "q1", label: "q1", isStart: false, isAccept: false },
-      { id: "q2", label: "q2", isStart: false, isAccept: false },
-      { id: "q3", label: "q3", isStart: false, isAccept: false },
-      { id: "q4", label: "q4", isStart: false, isAccept: false },
-      { id: "q5", label: "q5", isStart: false, isAccept: false },
-      { id: "q6", label: "q6", isStart: false, isAccept: false },
-      { id: "q7", label: "q7", isStart: false, isAccept: false },
-      { id: "q8", label: "q8", isStart: false, isAccept: false },
-      { id: "q9", label: "q9", isStart: false, isAccept: false },
-      { id: "q10", label: "q10", isStart: false, isAccept: false },
-      { id: "q11", label: "q11", isStart: false, isAccept: false },
-      { id: "q12", label: "q12", isStart: false, isAccept: false },
-      { id: "q13", label: "q13", isStart: false, isAccept: false },
-      { id: "q14", label: "q14", isStart: false, isAccept: true },
-      { id: "q15", label: "q15", isStart: false, isAccept: true },
-      { id: "T", label: "T", isStart: false, isAccept: false },
+      // START node (oblong/rounded square)
+      {
+        id: "START",
+        label: "START",
+        isStart: true,
+        isAccept: false,
+        shape: "rounded",
+      },
+
+      // READ nodes (diamond)
+      {
+        id: "q0",
+        label: "READ",
+        isStart: false,
+        isAccept: false,
+        shape: "diamond",
+      },
+      {
+        id: "q1",
+        label: "READ",
+        isStart: false,
+        isAccept: false,
+        shape: "diamond",
+      },
+      {
+        id: "q2",
+        label: "READ",
+        isStart: false,
+        isAccept: false,
+        shape: "diamond",
+      },
+      {
+        id: "q3",
+        label: "READ",
+        isStart: false,
+        isAccept: false,
+        shape: "diamond",
+      },
+      {
+        id: "q4",
+        label: "READ",
+        isStart: false,
+        isAccept: false,
+        shape: "diamond",
+      },
+      {
+        id: "q5",
+        label: "READ",
+        isStart: false,
+        isAccept: false,
+        shape: "diamond",
+      },
+      {
+        id: "q6",
+        label: "READ",
+        isStart: false,
+        isAccept: false,
+        shape: "diamond",
+      },
+      {
+        id: "q7",
+        label: "READ",
+        isStart: false,
+        isAccept: false,
+        shape: "diamond",
+      },
+      {
+        id: "q8",
+        label: "READ",
+        isStart: false,
+        isAccept: false,
+        shape: "diamond",
+      },
+      {
+        id: "q9",
+        label: "READ",
+        isStart: false,
+        isAccept: false,
+        shape: "diamond",
+      },
+      {
+        id: "q10",
+        label: "READ",
+        isStart: false,
+        isAccept: false,
+        shape: "diamond",
+      },
+      {
+        id: "q11",
+        label: "READ",
+        isStart: false,
+        isAccept: false,
+        shape: "diamond",
+      },
+      {
+        id: "q12",
+        label: "READ",
+        isStart: false,
+        isAccept: false,
+        shape: "diamond",
+      },
+      {
+        id: "q13",
+        label: "READ",
+        isStart: false,
+        isAccept: false,
+        shape: "diamond",
+      },
+      {
+        id: "q14",
+        label: "READ",
+        isStart: false,
+        isAccept: false,
+        shape: "diamond",
+      },
+      {
+        id: "q15",
+        label: "READ",
+        isStart: false,
+        isAccept: false,
+        shape: "diamond",
+      },
+      {
+        id: "T",
+        label: "READ",
+        isStart: false,
+        isAccept: false,
+        shape: "diamond",
+      },
+
+      // ACCEPT node (oblong/rounded square)
+      {
+        id: "ACCEPT",
+        label: "ACCEPT",
+        isStart: false,
+        isAccept: true,
+        shape: "rounded",
+      },
     ],
     alphabet: ["a", "b"],
     stackAlphabet: ["Z0", "a", "b"],
-    startState: "q0",
+    startState: "START",
     startStackSymbol: "Z0",
-    acceptStates: ["q14", "q15"],
+    acceptStates: ["ACCEPT"],
     transitions: [
+      // --------------------------------------------------------
+      // START → q0 (epsilon transition)
+      // --------------------------------------------------------
+      { from: "START", to: "q0", input: "", pop: "", push: "" },
+
       // --------------------------------------------------------
       // Layer 1: (bab)* prefix
       // --------------------------------------------------------
@@ -121,9 +331,6 @@ export const PDA_EXAMPLES: Record<string, PDA> = {
       { from: "q4", to: "T", input: "a", pop: "", push: "a" },
       { from: "q4", to: "q6", input: "b", pop: "", push: "b" },
 
-      // q6: ambiguous checkpoint after 'bab'
-      // on 'a' → q10 (preserved valid handoff)
-      // on 'b' → q1 (continue possible prefix loop)
       { from: "q6", to: "q10", input: "a", pop: "", push: "a" },
       { from: "q6", to: "q1", input: "b", pop: "", push: "b" },
 
@@ -179,6 +386,12 @@ export const PDA_EXAMPLES: Record<string, PDA> = {
       // --------------------------------------------------------
       { from: "T", to: "T", input: "a", pop: "", push: "a" },
       { from: "T", to: "T", input: "b", pop: "", push: "b" },
+
+      // --------------------------------------------------------
+      // q14, q15 → ACCEPT (epsilon transitions)
+      // --------------------------------------------------------
+      { from: "q14", to: "ACCEPT", input: "", pop: "", push: "" },
+      { from: "q15", to: "ACCEPT", input: "", pop: "", push: "" },
     ],
   },
 };

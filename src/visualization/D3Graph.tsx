@@ -61,7 +61,7 @@ const D3Graph: React.FC<D3GraphProps> = ({
     // Simulation nodes and links
     const nodes = states.map((s) => ({ ...s }));
 
-    // Group transitions by source and target to avoid overlapping lines
+    // Group transitions by source and target
     const linkGroups = new Map<string, any>();
     transitions.forEach((t, i) => {
       const key = `${t.from}-${t.to}`;
@@ -136,33 +136,92 @@ const D3Graph: React.FC<D3GraphProps> = ({
         });
       });
 
-    // Draw nodes
+    // ============================================================
+    // DRAW NODES — shape-aware rendering
+    // Only PDA states with shape="rounded" or shape="diamond"
+    // get special shapes. Everything else stays as circles.
+    // ============================================================
     const node = g.append("g").selectAll("g").data(nodes).enter().append("g");
 
-    node
-      .append("circle")
-      .attr("r", 28)
-      .attr("fill", (d: any) =>
-        d.id === activeStateId ? "#6366f1" : "#0f172a",
-      )
-      .attr("stroke", (d: any) => {
-        if (d.id === activeStateId) return "#818cf8";
-        if (d.isAccept) return "#10b981";
-        return "#334155";
-      })
-      .attr("stroke-width", (d: any) => (d.isAccept ? 3 : 2))
-      .attr("class", "transition-all duration-3000");
+    node.each(function (d: any) {
+      const el = d3.select(this);
+      const isActive = d.id === activeStateId;
+      const shape = d.shape || "circle";
 
-    // Double circle for accept states
-    node
-      .filter((d: any) => d.isAccept)
-      .append("circle")
-      .attr("r", 16)
-      .attr("fill", "none")
-      .attr("stroke", "#10b981")
-      .attr("stroke-width", 1);
+      const fillColor = isActive ? "#6366f1" : "#0f172a";
+      const strokeColor = isActive
+        ? "#818cf8"
+        : d.isAccept
+          ? "#10b981"
+          : "#334155";
+      const strokeWidth = d.isAccept ? 3 : 2;
 
-    // Labels
+      if (shape === "rounded") {
+        // ======================================================
+        // ROUNDED RECTANGLE — for START and ACCEPT PDA nodes
+        // ======================================================
+        el.append("rect")
+          .attr("x", -45)
+          .attr("y", -22)
+          .attr("width", 90)
+          .attr("height", 44)
+          .attr("rx", 14)
+          .attr("ry", 14)
+          .attr("fill", fillColor)
+          .attr("stroke", strokeColor)
+          .attr("stroke-width", strokeWidth)
+          .attr("class", "transition-all duration-3000");
+
+        // Inner border for accept states
+        if (d.isAccept) {
+          el.append("rect")
+            .attr("x", -39)
+            .attr("y", -16)
+            .attr("width", 78)
+            .attr("height", 32)
+            .attr("rx", 10)
+            .attr("ry", 10)
+            .attr("fill", "none")
+            .attr("stroke", "#10b981")
+            .attr("stroke-width", 1);
+        }
+      } else if (shape === "diamond") {
+        // ======================================================
+        // DIAMOND — for READ PDA nodes
+        // ======================================================
+        el.append("polygon")
+          .attr("points", "0,-30 35,0 0,30 -35,0")
+          .attr("fill", fillColor)
+          .attr("stroke", strokeColor)
+          .attr("stroke-width", strokeWidth)
+          .attr("class", "transition-all duration-3000");
+      } else {
+        // ======================================================
+        // DEFAULT CIRCLE — for DFA states (unchanged)
+        // ======================================================
+        el.append("circle")
+          .attr("r", 28)
+          .attr("fill", fillColor)
+          .attr("stroke", strokeColor)
+          .attr("stroke-width", strokeWidth)
+          .attr("class", "transition-all duration-3000");
+
+        // Double circle for accept states
+        if (d.isAccept) {
+          el.append("circle")
+            .attr("r", 16)
+            .attr("fill", "none")
+            .attr("stroke", "#10b981")
+            .attr("stroke-width", 1);
+        }
+      }
+    });
+
+    // ============================================================
+    // LABELS — show label inside node, and state ID below
+    // ============================================================
+
+    // Main label (inside the shape)
     node
       .append("text")
       .text((d: any) => d.label)
@@ -171,19 +230,49 @@ const D3Graph: React.FC<D3GraphProps> = ({
       .attr("fill", (d: any) =>
         d.id === activeStateId ? "#ffffff" : "#94a3b8",
       )
-      .attr("font-size", "12px")
+      .attr("font-size", (d: any) => {
+        // Smaller font for longer labels like "START" and "ACCEPT"
+        const shape = d.shape || "circle";
+        if (shape === "rounded") return "10px";
+        if (shape === "diamond") return "9px";
+        return "12px";
+      })
       .attr("font-weight", "bold");
 
-    // Start arrow
+    // State ID below the shape (small, dimmed)
+    // Only show for PDA states that have a shape property
+    // so DFA states don't get duplicate labels
+    node
+      .filter((d: any) => d.shape && d.label !== d.id)
+      .append("text")
+      .text((d: any) => d.id)
+      .attr("text-anchor", "middle")
+      .attr("dy", (d: any) => {
+        const shape = d.shape || "circle";
+        if (shape === "rounded") return 38;
+        if (shape === "diamond") return 42;
+        return 45;
+      })
+      .attr("fill", "#475569")
+      .attr("font-size", "8px")
+      .attr("font-family", "monospace");
+
+    // Start arrow (unchanged)
     node
       .filter((d: any) => d.isStart)
       .append("path")
-      .attr("d", "M -40 0 L -25 0")
+      .attr("d", (d: any) => {
+        const shape = d.shape || "circle";
+        // Adjust arrow position based on shape
+        if (shape === "rounded") return "M -55 0 L -46 0";
+        if (shape === "diamond") return "M -45 0 L -36 0";
+        return "M -40 0 L -25 0";
+      })
       .attr("stroke", "#475569")
       .attr("stroke-width", 2)
       .attr("marker-end", "url(#arrowhead)");
 
-    // Run simulation for a bit then stop for a static layout
+    // Run simulation then stop
     for (let i = 0; i < 300; ++i) simulation.tick();
     simulation.stop();
 
@@ -209,7 +298,7 @@ const D3Graph: React.FC<D3GraphProps> = ({
 
     g.attr("transform", `translate(${tx},${ty}) scale(${scale})`);
 
-    // Update positions once after simulation settlement
+    // Update positions
     link.attr("d", (d: any) => {
       const isSelfLoop = d.source.id === d.target.id;
       if (isSelfLoop) {
@@ -218,7 +307,6 @@ const D3Graph: React.FC<D3GraphProps> = ({
         return `M ${x} ${y} C ${x - 40} ${y - 60}, ${x + 40} ${y - 60}, ${x} ${y}`;
       }
 
-      // Check if there is a reverse link
       const hasReverse = links.some(
         (l) => l.source.id === d.target.id && l.target.id === d.source.id,
       );
@@ -226,7 +314,6 @@ const D3Graph: React.FC<D3GraphProps> = ({
         const dx = d.target.x - d.source.x;
         const dy = d.target.y - d.source.y;
         const dr = Math.sqrt(dx * dx + dy * dy);
-        // Curve to one side
         return `M ${d.source.x},${d.source.y} A ${dr},${dr} 0 0,1 ${d.target.x},${d.target.y}`;
       }
 
@@ -245,18 +332,14 @@ const D3Graph: React.FC<D3GraphProps> = ({
         x = d.source.x;
         y = d.source.y - 65;
       } else if (hasReverse) {
-        // Find mid point of the arc
         const dx = d.target.x - d.source.x;
         const dy = d.target.y - d.source.y;
-        const dr = Math.sqrt(dx * dx + dy * dy);
 
-        // Midpoint of the straight line
         const midX = (d.source.x + d.target.x) / 2;
         const midY = (d.source.y + d.target.y) / 2;
 
-        // Offset perpendicular to the line
         const angle = Math.atan2(dy, dx);
-        const offset = 30; // Push label out from the arc
+        const offset = 30;
         x = midX + Math.sin(angle) * offset;
         y = midY - Math.cos(angle) * offset;
       } else {
