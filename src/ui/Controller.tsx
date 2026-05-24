@@ -1,14 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import {
-  Play,
-  StepForward,
-  RotateCcw,
-  Settings,
-  Terminal,
-  Activity,
-  Layers,
-} from "lucide-react";
+import { Terminal, Activity, Layers } from "lucide-react";
 import DFASimulatorUI from "../dfa/DFASimulatorUI";
 import PDASimulatorUI from "../pda/PDASimulatorUI";
 import CFGSimulatorUI from "../cfg/CFGSimulatorUI";
@@ -24,92 +16,102 @@ export default function Controller() {
     { id: "CFG", label: "CFG Compiler", icon: Terminal },
   ];
 
-  return (
-    <div className="min-h-screen bg-[image:var(--image-sunset)] bg-cover bg-center bg-fixed text-slate-200">
-      {/* 
-         IMPORTANT: Add this next line to create a dark tint. 
-         Without this, your white text will be impossible to read against the bright sunset.
-      */}
-      <div className="min-h-screen bg-slate-550/50 backdrop-blur-[1px]">
+   return (
+    <div 
+      className="min-h-screen bg-dirt-full font-minecraft relative"
+      style={{
+        backgroundImage: "url('/mc_wallpaper_movie_vista_1920x1080.png')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}
+    >
       
-
-      <header className="border-b border-slate-900 bg-slate-950/80 backdrop-blur-md sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between gap-6">
-          <div className="flex items-center gap-4">
-            <div className="h-10 w-10 bg-indigo-600 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/20">
-              Σ
-            </div>
-            <div>
-<<<<<<< HEAD
-              <h1 className="text-4xl font-minecraft text-white uppercase leading-none mb-1">
-                Automata <span className="text-indigo-400">Compiler</span>
-=======
-              <h1 className="text-xl font-bold tracking-tight text-white uppercase leading-none mb-1">
-                Automata{" "}
-                <span className="text-indigo-400 font-normal">Compiler</span>
->>>>>>> origin/main
+      {/* HEADER: Exactly #212121 with Navigation on the right */}
+      <header className="bg-[#212121] shadow-xl relative z-50">
+        <div className="relative z-10 max-w-[1400px] mx-auto px-8 py-4 flex flex-row items-center justify-between gap-4">
+          <div className="flex flex-col gap-1">
+             <h1 className="text-4xl md:text-5xl tracking-tighter uppercase leading-none flex gap-x-4">
+                <span className="relative">
+                  <span className="absolute inset-0 text-transparent bg-gradient-to-b from-white via-white to-gray-400 bg-clip-text z-10">Automata</span>
+                  <span className="minecraft-logo-shadow text-black">Automata</span>
+                </span>
+                <span className="relative">
+                  <span className="absolute inset-0 text-transparent bg-gradient-to-b from-white via-white to-gray-400 bg-clip-text z-10">Compiler</span>
+                  <span className="minecraft-logo-shadow text-black">Compiler</span>
+                </span>
               </h1>
-              <p className="text-[10px] text-slate-500 font-mono tracking-widest uppercase">
-                DFA • PDA • CFG Processor
-              </p>
-            </div>
+            <p className="text-[14px] text-white/80 tracking-[0.5em] uppercase font-minecraft mc-text-shadow">
+              DFA • PDA • CFG
+            </p>
           </div>
 
-          <nav className="flex gap-2 bg-slate-900/50 p-1.5 rounded-full border border-slate-800">
+          {/* NAVIGATION: Right side, exactly following the reference style */}
+          <nav className="flex items-center gap-1">
             {tabs.map((tab) => {
-              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              
               return (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                   className={`flex items-center gap-2 px-6 py-2 rounded-full text-base font-minecraft transition-all uppercase tracking-widest ${
-                    activeTab === tab.id
-                      ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/30"
-                      : "text-slate-500 hover:text-slate-200 hover:bg-slate-800"
-                  }`}
-                  id={`tab-${tab.id.toLowerCase()}`}
+                  className={`
+                    relative px-8 py-4 transition-all uppercase text-[18px] tracking-widest font-bold
+                    flex items-center justify-center border-[1px]
+                    ${isActive 
+                      ? "border-[#88d9f1] bg-black/40 text-white" 
+                      : "border-transparent text-gray-400 hover:text-white"
+                    }
+                  `}
                 >
-                  <Icon className="w-3.5 h-3.5" />
-                  {tab.label}
+                  <span className={isActive ? "underline underline-offset-8 decoration-2" : ""}>
+                    {tab.label}
+                  </span>
                 </button>
               );
             })}
           </nav>
-
-          <div className="hidden lg:flex items-center gap-3">
-            <div className="bg-slate-900 border border-slate-800 px-4 py-2 rounded-full flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-              <span className="text-[10px] font-mono text-emerald-400 uppercase tracking-tight">
-                System Ready
-              </span>
-            </div>
-          </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 py-10">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.98 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-          >
-            {activeTab === "DFA" && <DFASimulatorUI />}
-            {activeTab === "PDA" && <PDASimulatorUI />}
-            {activeTab === "CFG" && <CFGSimulatorUI />}
-          </motion.div>
-        </AnimatePresence>
+      {/* MAIN CONTENT AREA */}
+      <main 
+        className="relative min-h-[calc(100vh-120px)] p-4 md:p-8 z-10"
+        style={{
+          backgroundImage: `url('/src/images/mc_wallpaper_movie_vista_1920x1080.png')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundAttachment: 'fixed'
+        }}
+      >
+        <div className="absolute inset-0 bg-black/10 pointer-events-none"></div>
+        <div className="max-w-7xl mx-auto relative z-10">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              {activeTab === "DFA" && <DFASimulatorUI />}
+              {activeTab === "PDA" && <PDASimulatorUI />}
+              {activeTab === "CFG" && <CFGSimulatorUI />}
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </main>
 
-      <footer className="py-8 mt-12">
-        <div className="max-w-7xl mx-auto px-6 flex justify-between items-center text-slate-500 text-[10px] uppercase tracking-widest font-mono">
-          <span>Automata Engine v2.4.0</span>
-          <span>© 2026 Formal Systems Lab</span>
-        </div>
+      <footer className="bg-black/90 py-8 text-center text-stone-400 uppercase tracking-[0.5em] text-[14px] relative z-20">
+        Automata Engine v2.4.0 • Formal Systems Lab
       </footer>
-    </div>
+
+      <style>{`
+        .minecraft-logo-shadow {
+          -webkit-text-stroke: 5px black;
+          paint-order: stroke fill;
+        }
+      `}</style>
     </div>
   );
 }

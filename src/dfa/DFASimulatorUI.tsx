@@ -20,7 +20,6 @@ export default function DFASimulatorUI() {
     useState<keyof typeof DFA_EXAMPLES>("dfa1");
   const [isValidRegex, setIsValidRegex] = useState(true);
 
-  // CHANGED: default input matches dfa1 alphabet and is a valid string
   const [inputString, setInputString] = useState("111111");
   const [currentStateId, setCurrentStateId] = useState("");
   const [activeTransitionIdx, setActiveTransitionIdx] = useState<
@@ -33,40 +32,17 @@ export default function DFASimulatorUI() {
   const simulatorRef = useRef<DFASimulator | null>(null);
   const dfa = DFA_EXAMPLES[selectedDfaKey];
 
-  // ============================================================
-  // Sample strings matching the corrected DFAs
-  // ============================================================
   const DFA_SAMPLE_STRINGS: Record<
     keyof typeof DFA_EXAMPLES,
     { valid: string[]; invalid: string[] }
   > = {
     dfa1: {
-      valid: [
-        "111111", // 11(double) + 1(bridge) + 111(pattern)
-        "0011010", // 00(double) + 1(bridge) + 101(pattern) + 0(tail)
-        "1111010", // 11(double) + 1(bridge) + 101(pattern) + 0(tail)
-        "00111110", // 00(double) + 1(bridge) + 111(pattern) + 10(tail)
-      ],
-      invalid: [
-        "11111", // too short, pattern incomplete
-        "00111", // too short, pattern incomplete
-        "010101010101", // no double (00 or 11)
-        "1100000000", // no pattern (101 or 111)
-      ],
+      valid: ["111111", "0011010", "1111010", "00111110"],
+      invalid: ["11111", "00111", "010101010101", "1100000000"],
     },
     dfa2: {
-      valid: [
-        "babababbb", // bab(L1) + a(L2) + bab(L3) + bb(tail)
-        "babaabbaa", // bab(L1) + a(L2) + aba(L3) + ...aa(tail)
-        "ababaaa", // a(L2) + bab(L3) + aa(tail)
-        "aabaabb", // a(L2) + aba(L3) + bb(tail)
-      ],
-      invalid: [
-        "baabaaa", // baa triggers trap at q4
-        "babababa", // ends in a, tail requires aa or bb
-        "baba", // too short, missing pattern
-        "aaaa", // no valid bab/aba pattern
-      ],
+      valid: ["babababbb", "babaabbaa", "ababaaa", "aabaabb"],
+      invalid: ["baabaaa", "babababa", "baba", "aaaa"],
     },
   };
 
@@ -85,9 +61,6 @@ export default function DFASimulatorUI() {
     }
   }, [regexInput]);
 
-  // ============================================================
-  // Reset AND set a sensible default input per DFA
-  // ============================================================
   useEffect(() => {
     if (selectedDfaKey === "dfa1") {
       setInputString("111111");
@@ -112,16 +85,11 @@ export default function DFASimulatorUI() {
     if (!simulatorRef.current) {
       simulatorRef.current = new DFASimulator(dfa, inputString);
     }
-
     if (simulatorRef.current.isFinished()) return false;
-
     const moved = simulatorRef.current.step();
     setCurrentStateId(simulatorRef.current.getCurrentStateId());
     setCurrentIndex(simulatorRef.current.getCurrentIndex());
-    setActiveTransitionIdx(
-      simulatorRef.current.getLastTransitionIdx() ?? undefined,
-    );
-
+    setActiveTransitionIdx(simulatorRef.current.getLastTransitionIdx() ?? undefined);
     if (simulatorRef.current.isFinished()) {
       setIsFinished(true);
       setIsAccepted(simulatorRef.current.isAccepted());
@@ -132,31 +100,17 @@ export default function DFASimulatorUI() {
   const run = async () => {
     if (isRunningRef.current || isFinished) return;
     isRunningRef.current = true;
-
-    while (
-      isRunningRef.current &&
-      simulatorRef.current &&
-      !simulatorRef.current.isFinished()
-    ) {
+    while (isRunningRef.current && simulatorRef.current && !simulatorRef.current.isFinished()) {
       const moved = step();
       if (!moved) break;
       await new Promise((resolve) => setTimeout(resolve, 1200));
     }
-
     isRunningRef.current = false;
   };
 
-  // ============================================================
-  // Filter input based on the current DFA's alphabet
-  // dfa1 → only '0' and '1'
-  // dfa2 → only 'a' and 'b'
-  // ============================================================
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const allowed = dfa.alphabet;
-    const filtered = e.target.value
-      .split("")
-      .filter((ch) => allowed.includes(ch))
-      .join("");
+    const filtered = e.target.value.split("").filter((ch) => allowed.includes(ch)).join("");
     setInputString(filtered);
   };
 
@@ -165,16 +119,20 @@ export default function DFASimulatorUI() {
   }, [inputString]);
 
   return (
-    <div className="grid grid-cols-12 lg:grid-rows-6 gap-6 min-h-[700px] lg:h-[calc(100vh-200px)]">
+    <div 
+      className="grid grid-cols-12 lg:grid-rows-6 gap-6 min-h-[700px] lg:h-[calc(100vh-200px)]"
+      style={{ fontFamily: "'Comfortaa', sans-serif" }} // Applying Comfortaa globally to the UI
+    >
+      <style>
+        {`@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap');`}
+      </style>
+
       {/* Control Panel Bento Box */}
-      <div className="col-span-12 lg:col-span-4 lg:row-span-3 bg-slate-900/50 border border-slate-900 rounded-3xl p-6 flex flex-col overflow-hidden">
-        <div className="flex items-center justify-between mb-6 shrink-0">
-          <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">
-            Formal Definition
+      <div className="col-span-12 lg:col-span-4 lg:row-span-3 bg-white/70 border border-white rounded-3xl p-6 flex flex-col overflow-hidden">
+        <div className="flex items-center justify-between mb-4 shrink-0">
+          <h3 className="text-[14px] font-semibold text-black uppercase tracking-widest">
+            DFA Visualizer
           </h3>
-          <span className="text-[10px] bg-slate-800 px-2 py-0.5 rounded text-indigo-400 font-mono">
-            DFA_SPEC
-          </span>
         </div>
 
         <div className="space-y-6 flex-grow overflow-y-auto pr-2 custom-scrollbar">
@@ -186,7 +144,7 @@ export default function DFASimulatorUI() {
               <select
                 value={regexInput}
                 onChange={(e) => setRegexInput(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-all font-mono text-xs text-indigo-300 appearance-none cursor-pointer"
+                className="w-full bg-black border border-white/70 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-all text-xs text-indigo-300 appearance-none cursor-pointer"
               >
                 <option value={REGEX_1}>
                   Problem 1: (1+0)* (11+00) (00+11)* (1+0+11) (1+0+11)*
@@ -204,8 +162,7 @@ export default function DFASimulatorUI() {
 
             <label className="block text-[10px] font-bold text-slate-600 uppercase mb-3 tracking-widest">
               Test String
-              {/* ADDED: Show which characters are allowed */}
-              <span className="ml-2 text-slate-700 normal-case font-mono">
+              <span className="ml-2 text-slate-700 normal-case">
                 (allowed: {dfa.alphabet.join(", ")})
               </span>
             </label>
@@ -215,7 +172,7 @@ export default function DFASimulatorUI() {
                 value={inputString}
                 onChange={handleInputChange}
                 placeholder={`Enter ${dfa.alphabet.join("/")} sequence...`}
-                className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-all font-mono text-indigo-300 text-lg tracking-widest"
+                className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-all text-indigo-300 text-lg tracking-widest"
               />
               <Terminal className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-700" />
             </div>
@@ -231,7 +188,7 @@ export default function DFASimulatorUI() {
                       key={sample}
                       type="button"
                       onClick={() => setInputString(sample)}
-                      className="rounded-2xl border border-emerald-500/30 px-3 py-2 text-xs font-mono text-emerald-300 hover:bg-emerald-500/10 transition"
+                      className="rounded-2xl bg-black border border-white/70 px-3 py-2 text-xs text-emerald-500 hover:bg-emerald-500 transition"
                     >
                       {sample}
                     </button>
@@ -249,7 +206,7 @@ export default function DFASimulatorUI() {
                       key={sample}
                       type="button"
                       onClick={() => setInputString(sample)}
-                      className="rounded-2xl border border-rose-500/30 px-3 py-2 text-xs font-mono text-rose-300 hover:bg-rose-500/10 transition"
+                      className="rounded-2xl bg-black border border-white/70 px-3 py-2 text-xs text-rose-500 hover:bg-rose-500/50 transition"
                     >
                       {sample}
                     </button>
@@ -260,11 +217,11 @@ export default function DFASimulatorUI() {
           </div>
         </div>
 
-        <div className="mt-8 pt-6 border-t border-slate-800/50 flex gap-3">
+        <div className="mt-4 pt-2 flex gap-3">
           <button
             onClick={run}
             disabled={isFinished}
-            className="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white py-3 rounded-full flex items-center justify-center gap-2 text-xs font-bold shadow-lg shadow-indigo-600/20 disabled:opacity-30 transition-all"
+            className="flex-1 bg-emerald-700 hover:bg-emerald-400 text-white py-3 rounded-full flex items-center justify-center gap-2 text-xs font-bold shadow-lg shadow-indigo-600/20 disabled:opacity-30 transition-all"
           >
             <Play className="w-4 h-4 fill-white" /> RUN
           </button>
@@ -285,21 +242,12 @@ export default function DFASimulatorUI() {
       </div>
 
       {/* Visualizer Bento Box */}
-      <div className="col-span-12 lg:col-span-8 lg:row-span-4 bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden relative shadow-2xl p-6 pt-16">
+      <div className="col-span-12 lg:col-span-8 lg:row-span-4 bg-white/70 border border-white rounded-3xl overflow-hidden relative shadow-2xl p-6 pt-16">
         <div className="absolute top-6 left-6 z-10">
-          <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">
+          <h3 className="text-xs font-bold text-black uppercase tracking-widest">
             State Visualization
           </h3>
         </div>
-
-        {/* Current state badge */}
-        {currentStateId && (
-          <div className="absolute top-6 right-6 z-10">
-            <span className="text-[10px] bg-slate-800 px-2 py-0.5 rounded text-indigo-400 font-mono">
-              CURRENT: {currentStateId}
-            </span>
-          </div>
-        )}
 
         <div className="flex items-center justify-center h-full">
           {isValidRegex ? (
@@ -323,22 +271,19 @@ export default function DFASimulatorUI() {
       </div>
 
       {/* Simulation Logs Bento Box */}
-      <div className="col-span-12 lg:col-span-4 lg:row-span-3 bg-slate-900/80 border border-slate-800 rounded-3xl p-6 flex flex-col overflow-hidden">
+      <div className="col-span-12 lg:col-span-4 lg:row-span-3 bg-white/70 border border-white/70 rounded-3xl p-6 flex flex-col overflow-hidden">
         <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-6 shrink-0">
           Transition Table
         </h3>
         <div className="flex-grow space-y-4 overflow-y-auto pr-2 custom-scrollbar">
-          <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 font-mono text-[11px] leading-relaxed">
+          <div className="bg-[#212121] p-4 rounded-2xl border border-[#212121] text-[11px] leading-relaxed">
             <p className="text-slate-500 mb-2">Initialize DFA processor...</p>
-            <p className="text-indigo-400">δ(q_start, Σ) {"->"} q_next</p>
-
-            {/* Show the alphabet for this DFA */}
+            <p className="text-blue-400">δ(q_start, Σ) {"->"} q_next</p>
             <p className="text-slate-600 mt-1 mb-4">
               Σ = {"{"}
               {dfa.alphabet.join(", ")}
               {"}"}
             </p>
-
             <div className="mt-4 space-y-1">
               {inputString.split("").map((char, idx) => (
                 <p
@@ -352,9 +297,7 @@ export default function DFASimulatorUI() {
                         : "text-slate-700")
                   }
                 >
-                  <span>
-                    Step {idx + 1}: Read '{char}'
-                  </span>
+                  <span>Step {idx + 1}: Read '{char}'</span>
                   <span>
                     {idx < currentIndex
                       ? "-> q_resolved"
@@ -388,7 +331,7 @@ export default function DFASimulatorUI() {
                   "text-sm font-black tracking-widest " +
                   (isFinished
                     ? isAccepted
-                      ? "text-emerald-400"
+                      ? "text-emerald-500"
                       : "text-rose-400"
                     : "text-slate-500")
                 }
@@ -402,7 +345,7 @@ export default function DFASimulatorUI() {
             </div>
             {isFinished &&
               (isAccepted ? (
-                <CheckCircle2 className="w-6 h-6 text-emerald-400 animate-bounce" />
+                <CheckCircle2 className="w-6 h-6 text-emerald-500 animate-bounce" />
               ) : (
                 <AlertCircle className="w-6 h-6 text-rose-400 animate-pulse" />
               ))}
@@ -411,7 +354,7 @@ export default function DFASimulatorUI() {
       </div>
 
       {/* Expression Context Bento Box */}
-      <div className="col-span-12 lg:col-span-8 lg:row-span-2 bg-slate-900/50 border border-slate-900 rounded-3xl p-6 flex flex-col gap-6 lg:flex-row items-start lg:items-center">
+      <div className="col-span-12 lg:col-span-8 lg:row-span-2 bg-white/70 border border-white/70 rounded-3xl p-6 flex flex-col gap-6 lg:flex-row items-start lg:items-center">
         <div className="flex-shrink-0 w-16 h-16 bg-slate-950 rounded-2xl border border-slate-800 flex items-center justify-center">
           <Info className="w-8 h-8 text-indigo-500 opacity-50" />
         </div>
@@ -419,26 +362,24 @@ export default function DFASimulatorUI() {
           <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">
             Automata Regular Expression
           </h3>
-          <p className="font-mono text-sm text-indigo-300 leading-relaxed max-w-2xl">
+          <p className="text-sm text-black leading-relaxed max-w-2xl">
             {selectedDfaKey === "dfa1"
               ? "(1+0)* (11+00) (00+11)* (1+0+11) (1+0+11)* (101+111) (101+111)* (1+0*+11) (1+0*+11)*"
               : "(bab)* (b+a) (bab+aba) (a+b)* (aa+bb)* (b+a+bb) (a+b)* (aa+bb)"}
           </p>
-
-          {/* DFA stats summary */}
           <div className="flex gap-4 mt-3">
-            <span className="text-[10px] text-slate-600 font-mono">
+            <span className="text-[10px] text-slate-600">
               States: {dfa.states.length}
             </span>
-            <span className="text-[10px] text-slate-600 font-mono">
+            <span className="text-[10px] text-slate-600">
               Alphabet: {"{"}
               {dfa.alphabet.join(", ")}
               {"}"}
             </span>
-            <span className="text-[10px] text-slate-600 font-mono">
+            <span className="text-[10px] text-slate-600">
               Transitions: {dfa.transitions.length}
             </span>
-            <span className="text-[10px] text-slate-600 font-mono">
+            <span className="text-[10px] text-slate-600">
               Accept:{" "}
               {dfa.states
                 .filter((s) => s.isAccept)

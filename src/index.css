@@ -1,44 +1,197 @@
 @import "tailwindcss";
 
-<<<<<<< HEAD
 @font-face {
   font-family: 'MinecraftFont';
   src: url('./fonts/minecraft.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
 }
 
 @theme {
   --font-minecraft: "MinecraftFont", sans-serif;
-  --image-sunset: url('./images/mine-sunset.webp');
-=======
-/* Compiler-themed scrollbars for internal scroll containers */
-.custom-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(79, 70, 229, 0.75) rgba(15, 23, 42, 0.85);
+  --image-dirt: url('./images/dirt.png');
+  --image-grass: url('./images/grass.jpg');
+  --image-wood: url('./images/wood.png');
 }
 
-.custom-scrollbar::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+
+:root {
+  font-family: var(--font-minecraft);
 }
 
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.85);
-  border-radius: 9999px;
+* {
+  /* Forces the crisp, blocky look for fonts and images */
+  image-rendering: pixelated;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(79, 70, 229, 0.75);
-  border-radius: 9999px;
-  border: 2px solid rgba(15, 23, 42, 0.85);
+
+button, input, select, textarea, pre, code {
+  font-family: inherit !important;
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(79, 70, 229, 0.95);
+.font-mono,
+.font-mono * {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace !important;
 }
 
-.custom-scrollbar::-webkit-scrollbar-corner {
-  background: transparent;
->>>>>>> origin/main
+
+@layer utilities {
+  /* 3D Text effect for the Logo */
+  .minecraft-logo-shadow {
+    text-shadow:
+      -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000,
+      0px 1px 0px #333, 0px 2px 0px #333, 0px 3px 0px #333, 0px 4px 0px #333, 0px 5px 0px #333,
+      0px 8px 15px rgba(0,0,0,0.5);
+  }
+
+
+  /* Dirt Tiles for the Page */
+  .bg-dirt-full {
+    background-image: var(--image-dirt);
+    background-repeat: repeat;
+    background-size: 64px;
+    background-attachment: fixed;
+  }
+ 
+  /* Grass Tiles for the Header */
+  .bg-grass-full {
+    background-image: var(--image-grass);
+    background-repeat: repeat;
+    background-size: 64px;
+  }
+
+
+  /* Wood Tiles for the Navigation Box */
+  .bg-wood-tiled {
+    background-image: var(--image-wood);
+    background-repeat: repeat;
+    background-size: 64px;
+  }
+
+
+  .chest-container {
+    background-image: var(--image-wood);
+    background-repeat: repeat;
+    background-size: 64px;
+    image-rendering: pixelated;
+    border: 6px solid #2d1d10;
+    box-shadow:
+      inset 4px 4px 0px rgba(255,255,255,0.15),
+      inset -4px -4px 0px rgba(0,0,0,0.5);
+  }
+
+
+  .bg-latch {
+    background-color: #bfb49e;
+    border: 3px solid #2d1d10;
+    box-shadow: inset -2px -2px 0px #5d5546, 2px 2px 4px rgba(0,0,0,0.4);
+  }
+
+
+  /* Text shadow para mas readable ang Minecraft font */
+  .mc-text-shadow {
+    text-shadow: 2px 2px 0px rgba(0,0,0,0.8);
+  }
+
+
+
+
+}
+@import "tailwindcss";
+
+
+@font-face {
+  font-family: 'MinecraftFont';
+  src: url('./fonts/minecraft.ttf') format('truetype');
+}
+
+
+@theme {
+  --font-minecraft: "MinecraftFont", sans-serif;
+  --image-dirt: url('./images/dirt.png');
+  --image-grass: url('./images/grass.jpg');
+  --image-wood: url('./images/wood.png');
+}
+
+
+:root {
+  font-family: var(--font-minecraft);
+}
+
+
+* {
+  /* Forces the crisp, blocky look for fonts and images */
+  image-rendering: pixelated;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+button, input, select, textarea, pre, code {
+  font-family: inherit !important;
+}
+
+
+@layer utilities {
+  /* 3D Text effect for the Logo */
+  .minecraft-logo-shadow {
+    text-shadow:
+      -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000,
+      0px 1px 0px #333, 0px 2px 0px #333, 0px 3px 0px #333, 0px 4px 0px #333, 0px 5px 0px #333,
+      0px 8px 15px rgba(0,0,0,0.5);
+  }
+
+
+  /* Dirt Tiles for the Page */
+  .bg-dirt-full {
+    background-image: var(--image-dirt);
+    background-repeat: repeat;
+    background-size: 64px;
+    background-attachment: fixed;
+  }
+ 
+  /* Grass Tiles for the Header */
+  .bg-grass-full {
+    background-image: var(--image-grass);
+    background-repeat: repeat;
+    background-size: 64px;
+  }
+
+
+  /* Wood Tiles for the Navigation Box */
+  .bg-wood-tiled {
+    background-image: var(--image-wood);
+    background-repeat: repeat;
+    background-size: 64px;
+  }
+
+
+  .chest-container {
+    background-image: var(--image-wood);
+    background-repeat: repeat;
+    background-size: 64px;
+    image-rendering: pixelated;
+    border: 6px solid #2d1d10;
+    box-shadow:
+      inset 4px 4px 0px rgba(255,255,255,0.15),
+      inset -4px -4px 0px rgba(0,0,0,0.5);
+  }
+
+
+  .bg-latch {
+    background-color: #bfb49e;
+    border: 3px solid #2d1d10;
+    box-shadow: inset -2px -2px 0px #5d5546, 2px 2px 4px rgba(0,0,0,0.4);
+  }
+
+
+  /* Text shadow para mas readable ang Minecraft font */
+  .mc-text-shadow {
+    text-shadow: 2px 2px 0px rgba(0,0,0,0.8);
+  }
+
+
+
+
 }
