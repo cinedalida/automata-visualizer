@@ -126,7 +126,7 @@ export default function DFASimulatorUI() {
       <style>
         {`@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap');`}
       </style>
-
+ 
       {/* Control Panel Bento Box */}
       <div className="col-span-12 lg:col-span-4 lg:row-span-3 bg-white/70 border border-white rounded-3xl p-6 flex flex-col overflow-hidden">
         <div className="flex items-center justify-between mb-4 shrink-0">
@@ -144,7 +144,7 @@ export default function DFASimulatorUI() {
               <select
                 value={regexInput}
                 onChange={(e) => setRegexInput(e.target.value)}
-                className="w-full bg-black border border-white/70 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-all text-xs text-indigo-300 appearance-none cursor-pointer"
+                className="w-full bg-white border border-white/70 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-blue transition-all text-xs text-blue appearance-none cursor-pointer"
               >
                 <option value={REGEX_1}>
                   Problem 1: (1+0)* (11+00) (00+11)* (1+0+11) (1+0+11)*
@@ -156,7 +156,7 @@ export default function DFASimulatorUI() {
                 </option>
               </select>
               <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none">
-                <ChevronRight className="w-4 h-4 text-slate-600 rotate-90" />
+                <ChevronRight className="w-4 h-4 text-black rotate-90" />
               </div>
             </div>
 
@@ -172,7 +172,7 @@ export default function DFASimulatorUI() {
                 value={inputString}
                 onChange={handleInputChange}
                 placeholder={`Enter ${dfa.alphabet.join("/")} sequence...`}
-                className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-all text-indigo-300 text-lg tracking-widest"
+                className="w-full bg-white border border-white/70 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-blue transition-all text-xs text-black appearance-none cursor-pointer"
               />
               <Terminal className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-700" />
             </div>
@@ -188,7 +188,7 @@ export default function DFASimulatorUI() {
                       key={sample}
                       type="button"
                       onClick={() => setInputString(sample)}
-                      className="rounded-2xl bg-black border border-white/70 px-3 py-2 text-xs text-emerald-500 hover:bg-emerald-500 transition"
+                      className="rounded-2xl bg-black border border-white/70 px-3 py-2 text-xs text-emerald-500 transition"
                     >
                       {sample}
                     </button>
@@ -206,7 +206,7 @@ export default function DFASimulatorUI() {
                       key={sample}
                       type="button"
                       onClick={() => setInputString(sample)}
-                      className="rounded-2xl bg-black border border-white/70 px-3 py-2 text-xs text-rose-500 hover:bg-rose-500/50 transition"
+                      className="rounded-2xl bg-black border border-white/70 px-3 py-2 text-xs text-rose-500 transition"
                     >
                       {sample}
                     </button>
@@ -228,13 +228,13 @@ export default function DFASimulatorUI() {
           <button
             onClick={step}
             disabled={isFinished}
-            className="bg-slate-800 text-white rounded-full p-3 border border-slate-700 transition-all hover:bg-slate-700 disabled:opacity-30"
+            className="bg-[#212121] text-white rounded-full p-3 border transition-all hover:bg-emerald-500 disabled:opacity-30"
           >
             <StepForward className="w-5 h-5" />
           </button>
           <button
             onClick={reset}
-            className="bg-slate-800 text-white rounded-full p-3 border border-slate-700 transition-all hover:bg-slate-700"
+            className="bg-[#212121] text-white rounded-full p-3 border transition-all hover:bg-emerald-500"
           >
             <RotateCcw className="w-5 h-5" />
           </button>
@@ -276,9 +276,9 @@ export default function DFASimulatorUI() {
           Transition Table
         </h3>
         <div className="flex-grow space-y-4 overflow-y-auto pr-2 custom-scrollbar">
-          <div className="bg-[#212121] p-4 rounded-2xl border border-[#212121] text-[11px] leading-relaxed">
+          <div className="bg-white p-4 rounded-2xl text-[11px] leading-relaxed">
             <p className="text-slate-500 mb-2">Initialize DFA processor...</p>
-            <p className="text-blue-400">δ(q_start, Σ) {"->"} q_next</p>
+            <p className="text-black">δ(q_start, Σ) {"->"} q_next</p>
             <p className="text-slate-600 mt-1 mb-4">
               Σ = {"{"}
               {dfa.alphabet.join(", ")}
@@ -314,7 +314,7 @@ export default function DFASimulatorUI() {
         <div className="mt-6">
           <div
             className={
-              "p-4 rounded-2xl border transition-all duration-300 flex items-center justify-between " +
+              "bg-white p-4 rounded-2xl transition-all duration-300 flex items-center justify-between " +
               (isFinished
                 ? isAccepted
                   ? "bg-emerald-500/10 border-emerald-500/30"
@@ -323,7 +323,7 @@ export default function DFASimulatorUI() {
             }
           >
             <div>
-              <span className="text-[10px] text-slate-600 font-bold uppercase block mb-1">
+              <span className="text-[10px] text-black font-bold uppercase block mb-1">
                 Compiler Result
               </span>
               <span
@@ -333,7 +333,7 @@ export default function DFASimulatorUI() {
                     ? isAccepted
                       ? "text-emerald-500"
                       : "text-rose-400"
-                    : "text-slate-500")
+                    : "text-black")
                 }
               >
                 {isFinished
@@ -354,12 +354,12 @@ export default function DFASimulatorUI() {
       </div>
 
       {/* Expression Context Bento Box */}
-      <div className="col-span-12 lg:col-span-8 lg:row-span-2 bg-white/70 border border-white/70 rounded-3xl p-6 flex flex-col gap-6 lg:flex-row items-start lg:items-center">
-        <div className="flex-shrink-0 w-16 h-16 bg-slate-950 rounded-2xl border border-slate-800 flex items-center justify-center">
-          <Info className="w-8 h-8 text-indigo-500 opacity-50" />
+      <div className="col-span-12 lg:col-span-8 lg:row-span-1.5 bg-white/70 border border-white/70 rounded-3xl p-6 flex flex-col gap-6 lg:flex-row items-start lg:items-center">
+        <div className="flex-shrink-0 w-16 h-16 bg-white rounded-2xl flex items-center justify-center">
+          <Info className="w-8 h-8 text-black opacity-50" />
         </div>
         <div className="flex-grow">
-          <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">
+          <h3 className="text-xs font-bold text-black uppercase tracking-widest mb-2">
             Automata Regular Expression
           </h3>
           <p className="text-sm text-black leading-relaxed max-w-2xl">
@@ -368,18 +368,18 @@ export default function DFASimulatorUI() {
               : "(bab)* (b+a) (bab+aba) (a+b)* (aa+bb)* (b+a+bb) (a+b)* (aa+bb)"}
           </p>
           <div className="flex gap-4 mt-3">
-            <span className="text-[10px] text-slate-600">
+            <span className="text-[10px] text-black">
               States: {dfa.states.length}
             </span>
-            <span className="text-[10px] text-slate-600">
+            <span className="text-[10px] text-black">
               Alphabet: {"{"}
               {dfa.alphabet.join(", ")}
               {"}"}
             </span>
-            <span className="text-[10px] text-slate-600">
+            <span className="text-[10px] text-black">
               Transitions: {dfa.transitions.length}
             </span>
-            <span className="text-[10px] text-slate-600">
+            <span className="text-[10px] text-black">
               Accept:{" "}
               {dfa.states
                 .filter((s) => s.isAccept)

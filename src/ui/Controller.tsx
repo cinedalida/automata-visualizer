@@ -102,8 +102,8 @@ export default function Controller() {
         </div>
       </main>
 
-      <footer className="bg-black/90 py-8 text-center text-stone-400 uppercase tracking-[0.5em] text-[14px] relative z-20">
-        Automata Engine v2.4.0 • Formal Systems Lab
+      <footer className="bg-black/90 py-8 text-center text-white uppercase tracking-[0.5em] text-[14px] relative z-20">
+        Dalida • Dalistan • Panganiban • Perdito
       </footer>
 
       <style>{`

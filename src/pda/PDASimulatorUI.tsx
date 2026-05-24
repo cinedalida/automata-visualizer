@@ -224,7 +224,7 @@ export default function PDASimulatorUI() {
                 <select
                   value={regexInput}
                   onChange={(e) => setRegexInput(e.target.value)}
-                  className="w-full bg-black border border-white/70 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-all text-xs text-indigo-300 appearance-none cursor-pointer"
+                  className="w-full bg-white rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-blue transition-all text-xs text-black appearance-none cursor-pointer"
                 >
                   <option value={REGEX_1}>
                     Problem 1: (1+0)* (11+00) (00+11)* (1+0+11) (1+0+11)*
@@ -252,7 +252,7 @@ export default function PDASimulatorUI() {
                   value={inputString}
                   onChange={handleInputChange}
                   placeholder={`Enter ${pda.alphabet.join("/")} stream...`}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-all text-indigo-300 text-lg tracking-widest"
+                  className="w-full bg-white border border-white/70 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-blue transition-all text-xs text-black appearance-none cursor-pointer"
                 />
                 <Terminal className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-700" />
               </div>
@@ -269,7 +269,7 @@ export default function PDASimulatorUI() {
                       key={sample}
                       type="button"
                       onClick={() => setInputString(sample)}
-                      className="rounded-2xl bg-black border border-white/70 px-3 py-2 text-xs text-emerald-500 hover:bg-emerald-500 transition"
+                      className="rounded-2xl bg-black border border-white/70 px-3 py-2 text-xs text-emerald-500 transition"
                     >
                       {sample}
                     </button>
@@ -287,7 +287,7 @@ export default function PDASimulatorUI() {
                       key={sample}
                       type="button"
                       onClick={() => setInputString(sample)}
-                      className="rounded-2xl bg-black border border-white/70 px-3 py-2 text-xs text-rose-500 hover:bg-rose-500/50 transition"
+                      className="rounded-2xl bg-black border border-white/70 px-3 py-2 text-xs text-rose-500 transition"
                     >
                       {sample}
                     </button>
@@ -309,13 +309,13 @@ export default function PDASimulatorUI() {
           <button
             onClick={step}
             disabled={isFinished}
-            className="bg-slate-800 text-white rounded-full p-3 border border-slate-700 transition-all hover:bg-slate-700 disabled:opacity-30"
+            className="bg-[#212121] text-white rounded-full p-3 border transition-all hover:bg-emerald-500 disabled:opacity-30"
           >
             <StepForward className="w-5 h-5" />
           </button>
           <button
             onClick={reset}
-            className="bg-slate-800 text-white rounded-full p-3 border border-slate-700 transition-all hover:bg-slate-700"
+            className="bg-[#212121] text-white rounded-full p-3 border transition-all hover:bg-emerald-500"
           >
             <RotateCcw className="w-5 h-5" />
           </button>
@@ -332,7 +332,7 @@ export default function PDASimulatorUI() {
 
         {currentStateId && (
           <div className="absolute top-6 right-6 z-10">
-            <span className="text-[10px] bg-slate-900 px-3 py-1 rounded-full text-indigo-400 font-bold border border-white/10">
+            <span className="text-[10px] bg-white px-3 py-1 rounded-full text-black font-bold border border-white/70">
               ACTIVE: {currentStateId}
             </span>
           </div>
@@ -357,10 +357,10 @@ export default function PDASimulatorUI() {
       {/* Stack View Bento Box */}
       <div className="col-span-12 lg:col-span-4 lg:row-span-3 bg-white/70 border border-white rounded-3xl p-6 flex flex-col overflow-hidden">
         <div className="flex items-center justify-between mb-4 shrink-0">
-          <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">
+          <h3 className="text-xs font-bold text-black uppercase tracking-widest">
             Stack Memory
           </h3>
-          <span className="text-[10px] bg-indigo-50 px-2 py-1 rounded-lg text-indigo-600 font-bold">
+          <span className="text-[10px] bg-indigo-50 px-2 py-1 rounded-lg text-black font-bold">
             DEPTH: {stack.length}
           </span>
         </div>
@@ -370,7 +370,7 @@ export default function PDASimulatorUI() {
       {/* Operational Trace Bento Box */}
       <div className="col-span-12 lg:col-span-8 lg:row-span-2 bg-white/70 border border-white rounded-3xl p-6 flex flex-col overflow-hidden">
         <div className="flex items-center justify-between mb-4 shrink-0">
-          <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">
+          <h3 className="text-xs font-bold text-black uppercase tracking-widest">
             Operational Trace
           </h3>
           <div
@@ -390,7 +390,7 @@ export default function PDASimulatorUI() {
                   ? isAccepted
                     ? "text-emerald-500"
                     : "text-rose-400"
-                  : "text-indigo-400")
+                  : "text-black")
               }
             >
               {isFinished
