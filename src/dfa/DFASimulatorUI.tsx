@@ -130,7 +130,7 @@ export default function DFASimulatorUI() {
       {/* Control Panel Bento Box */}
       <div className="col-span-12 lg:col-span-4 lg:row-span-3 bg-white/70 border border-white rounded-none p-6 flex flex-col overflow-hidden">
         <div className="flex items-center justify-between mb-4 shrink-0">
-          <h3 className="text-[14px] font-semibold text-black uppercase tracking-widest">
+          <h3 className="text-[20px] font-bold text-black uppercase tracking-widest leading-none">
             DFA Visualizer
           </h3>
         </div>
@@ -352,11 +352,11 @@ export default function DFASimulatorUI() {
                     : "text-slate-600")
                 }
               >
-                {isFinished
-                  ? isAccepted
-                    ? "ACCEPTED"
-                    : "REJECTED"
-                  : "IDLE_STATE"}
+              {isFinished
+                ? isAccepted
+                  ? "ACCEPTED"
+                  : "REJECTED"
+                : "IDLE"}
               </span>
             </div>
             {isFinished &&

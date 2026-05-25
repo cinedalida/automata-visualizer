@@ -208,8 +208,8 @@ export default function PDASimulatorUI() {
       <div className="col-span-12 lg:col-span-4 lg:row-span-2 bg-white/70 border border-white rounded-none p-6 flex flex-col overflow-hidden">
         <div className="flex items-center justify-between mb-4 shrink-0">
           <div className="flex items-center gap-2">
-            <h3 className="text-[14px] font-semibold text-black uppercase tracking-widest">
-              PDA Visualizer
+            <h3 className="text-[20px] font-bold text-black uppercase tracking-widest leading-none">
+              PDA Simulator
             </h3>
           </div>
         </div>
