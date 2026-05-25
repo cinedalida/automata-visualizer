@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Terminal, Activity, Layers } from "lucide-react";
+import { Terminal, Activity, Layers, Menu, X } from "lucide-react";
 import DFASimulatorUI from "../dfa/DFASimulatorUI";
 import PDASimulatorUI from "../pda/PDASimulatorUI";
 import CFGSimulatorUI from "../cfg/CFGSimulatorUI";
@@ -10,6 +10,7 @@ type Tab = "DFA" | "PDA" | "CFG";
 
 export default function Controller() {
   const [activeTab, setActiveTab] = useState<Tab>("DFA");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const tabs: { id: Tab; label: string; icon: any }[] = [
     { id: "DFA", label: "DFA Visualizer", icon: Activity },
@@ -30,9 +31,9 @@ export default function Controller() {
 
       {/* HEADER: Exactly #212121 with Navigation on the right */}
       <header className="bg-[#212121] shadow-xl relative z-50">
-        <div className="relative z-10 max-w-[1550px] mx-auto px-8 py-4 flex flex-row items-center justify-between gap-4">
+        <div className="relative z-10 max-w-[1550px] mx-auto px-4 sm:px-8 py-4 flex flex-row items-center justify-between gap-4">
           <div className="flex flex-col gap-1">
-            <h1 className="text-4xl md:text-5xl tracking-tighter uppercase leading-none flex gap-x-4">
+            <h1 className="text-2xl sm:text-3xl md:text-5xl tracking-tighter uppercase leading-none flex gap-x-2 sm:gap-x-4">
               <span className="relative">
                 <span className="absolute inset-0 text-transparent bg-gradient-to-b from-white via-white to-gray-400 bg-clip-text z-10">Automata</span>
                 <span className="minecraft-logo-shadow text-black">Automata</span>
@@ -42,13 +43,13 @@ export default function Controller() {
                 <span className="minecraft-logo-shadow text-black">Compiler</span>
               </span>
             </h1>
-            <p className="text-[14px] text-white/80 tracking-[0.5em] uppercase font-minecraft mc-text-shadow">
+            <p className="text-[10px] sm:text-[12px] md:text-[14px] text-white/80 tracking-[0.2em] sm:tracking-[0.5em] uppercase font-minecraft mc-text-shadow">
               DFA • PDA • CFG
             </p>
           </div>
 
-          {/* NAVIGATION: Right side, exactly following the reference style */}
-          <nav className="flex items-center gap-1">
+          {/* NAVIGATION: Right side, exactly following the reference style (Desktop) */}
+          <nav className="hidden lg:flex items-center gap-1">
             {tabs.map((tab) => {
               const isActive = activeTab === tab.id;
 
@@ -72,7 +73,63 @@ export default function Controller() {
               );
             })}
           </nav>
+
+          {/* MOBILE NAV BUTTON (visible on screens smaller than lg) */}
+          <div className="lg:hidden flex items-center">
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="p-2 border border-slate-700 bg-black/20 text-white hover:border-[#88d9f1] active:bg-[#88d9f1]/20 transition-all focus:outline-none"
+              aria-label="Toggle navigation menu"
+            >
+              {isMenuOpen ? (
+                <X className="w-6 h-6 text-[#88d9f1]" />
+              ) : (
+                <Menu className="w-6 h-6 text-white" />
+              )}
+            </button>
+          </div>
         </div>
+
+        {/* MOBILE NAVIGATION DRAWER */}
+        <AnimatePresence>
+          {isMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.2 }}
+              className="lg:hidden bg-[#212121] border-t border-slate-700/60 overflow-hidden relative z-40"
+            >
+              <div className="px-6 py-4 flex flex-col gap-2">
+                {tabs.map((tab) => {
+                  const isActive = activeTab === tab.id;
+                  const Icon = tab.icon;
+
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => {
+                        setActiveTab(tab.id);
+                        setIsMenuOpen(false);
+                      }}
+                      className={`
+                        w-full px-6 py-4 text-[16px] tracking-widest font-bold uppercase transition-all
+                        flex items-center gap-4 border-[1px]
+                        ${isActive
+                          ? "border-[#88d9f1] bg-black/40 text-[#88d9f1]"
+                          : "border-transparent text-gray-300 hover:text-white hover:bg-black/10"
+                        }
+                      `}
+                    >
+                      <Icon className="w-5 h-5" />
+                      <span>{tab.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
 
       {/* MAIN CONTENT AREA */}
