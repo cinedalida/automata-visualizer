@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import {
   Send,
   Terminal,
-  ClipboardList,
   CheckCircle2,
   AlertCircle,
   ChevronRight,
@@ -83,7 +82,7 @@ export default function CFGSimulatorUI() {
 
   return (
     <div 
-      className="grid grid-cols-12 lg:grid-rows-6 gap-6 min-h-[700px] lg:h-[calc(100vh-200px)]"
+      className="grid grid-cols-12 lg:grid-rows-6 gap-6 min-h-[850px] lg:h-[880px]"
       style={{ fontFamily: "'Comfortaa', sans-serif" }}
     >
       <style>
@@ -91,14 +90,11 @@ export default function CFGSimulatorUI() {
       </style>
 
       {/* Compiler Console Bento Box */}
-      <div className="col-span-12 lg:col-span-4 lg:row-span-3 bg-white/70 border border-white rounded-3xl p-6 flex flex-col overflow-hidden">
+      <div className="col-span-12 lg:col-span-4 lg:row-span-3 bg-white/70 border border-white rounded-none p-6 flex flex-col overflow-hidden">
         <div className="flex items-center justify-between mb-6 shrink-0">
           <h3 className="text-[14px] font-semibold text-black uppercase tracking-widest">
             CFG Compiler
           </h3>
-          <span className="text-[10px] bg-emerald-50 px-2 py-1 rounded text-emerald-600 font-bold border border-emerald-100">
-            TYPE_2_PARSER
-          </span>
         </div>
 
         <div className="space-y-6 flex-grow overflow-y-auto pr-2 custom-scrollbar">
@@ -106,24 +102,31 @@ export default function CFGSimulatorUI() {
             <label className="block text-[10px] font-bold text-slate-600 uppercase mb-3 tracking-widest">
               Select Regex Problem
             </label>
-            <div className="relative mb-6">
+            <div className="relative mb-4">
               <select
                 value={regexInput}
                 onChange={(e) => setRegexInput(e.target.value)}
-                className="w-full bg-white rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-blue transition-all text-xs text-black appearance-none cursor-pointer"
+                className="w-full bg-white border border-slate-200/80 rounded-none px-5 py-4 focus:outline-none focus:ring-2 focus:ring-[#0077B6]/20 text-xs text-slate-800 appearance-none cursor-pointer hover:border-slate-300 transition-all font-medium pr-10"
               >
                 <option value={REGEX_1}>
-                  Problem 1: (1+0)* (11+00) (00+11)* (1+0+11) (1+0+11)*
-                  (101+111) (101+111)* (1+0*+11) (1+0*+11)*
+                  Problem 1: (1+0)* (11+00)...
                 </option>
                 <option value={REGEX_2}>
-                  Problem 2: (bab)* (b+a) (bab+aba) (a+b)* (aa+bb)* (b+a+bb)
-                  (a+b)* (aa+bb)
+                  Problem 2: (bab)* (b+a)...
                 </option>
               </select>
               <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none">
-                <ChevronRight className="w-4 h-4 text-slate-600 rotate-90" />
+                <ChevronRight className="w-4 h-4 text-slate-500 rotate-90" />
               </div>
+            </div>
+
+            {/* Premium Full View Expression Display Box */}
+            <div className="mb-6 p-4 bg-[#0077B6]/5 border border-[#0077B6]/10 text-[11px] text-slate-800 leading-relaxed font-bold break-words rounded-none">
+              <span className="text-[9px] uppercase tracking-widest text-[#0077B6] block mb-1">Full Selected Problem:</span>
+              {regexInput === REGEX_1 
+                ? "Problem 1: (1+0)* (11+00) (00+11)* (1+0+11) (1+0+11)* (101+111) (101+111)* (1+0*+11) (1+0*+11)*"
+                : "Problem 2: (bab)* (b+a) (bab+aba) (a+b)* (aa+bb)* (b+a+bb) (a+b)* (aa+bb)"
+              }
             </div>
 
             <label className="block text-[10px] font-bold text-slate-600 uppercase mb-3 tracking-widest">
@@ -138,12 +141,12 @@ export default function CFGSimulatorUI() {
                 value={inputString}
                 onChange={(e) => handleInputChange(e.target.value)}
                 placeholder={`Enter ${cfg.terminals.join("/")} string...`}
-                className="w-full bg-white border border-white/70 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-blue transition-all text-xs text-black appearance-none cursor-pointer"
+                className="w-full bg-white border border-slate-200/80 rounded-none px-5 py-4 focus:outline-none focus:ring-2 focus:ring-[#0077B6]/20 text-xs text-slate-800 appearance-none hover:border-slate-300 transition-all font-medium"
               />
               <button
                 onClick={validate}
                 disabled={isValidating || !inputString}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-emerald-500 rounded-xl text-white disabled:opacity-30 transition-all shadow-lg shadow-blue-600/20"
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-emerald-500 text-white hover:bg-emerald-400 rounded-none disabled:opacity-30 transition-all shadow-lg shadow-emerald-500/10 cursor-pointer"
               >
                 <Send className="w-4 h-4" />
               </button>
@@ -160,7 +163,7 @@ export default function CFGSimulatorUI() {
                       key={sample}
                       type="button"
                       onClick={() => setInputString(sample)}
-                      className="rounded-2xl bg-black border border-white/70 px-3 py-2 text-xs text-emerald-500 transition"
+                      className="rounded-none bg-white border border-emerald-200/60 px-3.5 py-2.5 text-xs text-emerald-700 font-bold hover:bg-emerald-50/80 hover:text-emerald-800 hover:border-emerald-400 hover:shadow-sm transition-all duration-200 cursor-pointer"
                     >
                       {sample}
                     </button>
@@ -178,7 +181,7 @@ export default function CFGSimulatorUI() {
                       key={sample}
                       type="button"
                       onClick={() => setInputString(sample)}
-                      className="rounded-2xl bg-black border border-white/70 px-3 py-2 text-xs text-rose-500 transition"
+                      className="rounded-none bg-white border border-rose-200/60 px-3.5 py-2.5 text-xs text-rose-700 font-bold hover:bg-rose-50/80 hover:text-rose-800 hover:border-rose-400 hover:shadow-sm transition-all duration-200 cursor-pointer"
                     >
                       {sample}
                     </button>
@@ -190,12 +193,12 @@ export default function CFGSimulatorUI() {
 
           <div
             className={
-              "p-4 rounded-2xl border transition-all duration-300 flex items-center justify-between " +
+              "p-4 rounded-none border transition-all duration-300 flex items-center justify-between " +
               (result?.isAccepted
-                ? "bg-white border-emerald-500/30"
+                ? "bg-emerald-50 border-emerald-200"
                 : result
-                ? "bg-white border-white/50"
-                : "bg-slate-950 border-slate-800")
+                ? "bg-rose-50 border-rose-200"
+                : "bg-slate-50 border-slate-200")
             }
           >
             <div>
@@ -207,9 +210,9 @@ export default function CFGSimulatorUI() {
                   "text-sm font-black tracking-widest " +
                   (result
                     ? result.isAccepted
-                      ? "text-emerald-500"
-                      : "text-rose-400"
-                    : "text-slate-500")
+                      ? "text-emerald-600"
+                      : "text-rose-600"
+                    : "text-slate-600")
                 }
               >
                 {isValidating
@@ -223,9 +226,9 @@ export default function CFGSimulatorUI() {
             </div>
             {result &&
               (result.isAccepted ? (
-                <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                <CheckCircle2 className="w-5 h-5 text-emerald-500" />
               ) : (
-                <AlertCircle className="w-5 h-5 text-rose-400" />
+                <AlertCircle className="w-5 h-5 text-rose-500" />
               ))}
           </div>
         </div>
@@ -238,7 +241,7 @@ export default function CFGSimulatorUI() {
       </div>
 
       {/* Grammar Rules Bento Box */}
-      <div className="col-span-12 lg:col-span-8 lg:row-span-3 bg-white/70 border border-white rounded-3xl p-6 shadow-2xl relative overflow-hidden">
+      <div className="col-span-12 lg:col-span-8 lg:row-span-3 bg-white/70 border border-white rounded-none p-6 shadow-2xl relative overflow-hidden">
         <div className="relative z-10 h-full min-h-0">
           <h3 className="text-xs font-bold text-black uppercase tracking-widest mb-6">
             Formal Grammar Definition (G)
@@ -249,9 +252,9 @@ export default function CFGSimulatorUI() {
                 Object.entries(cfg.productions).map(([v, prods]) => (
                   <div
                     key={v}
-                    className="bg-white/80 p-4 rounded-2xl border border-slate-100 shadow-sm"
+                    className="bg-white/80 p-4 rounded-none border border-slate-100 shadow-sm"
                   >
-                    <span className="text-[10px] text-indigo-500 font-bold block mb-1">
+                    <span className="text-[10px] text-[#0077B6] font-bold block mb-1">
                       {v}
                     </span>
                     <div className="text-sm font-bold text-slate-700">
@@ -270,17 +273,16 @@ export default function CFGSimulatorUI() {
       </div>
 
       {/* Derivation Steps Bento Box */}
-      <div className="col-span-12 lg:col-span-8 lg:row-span-4 bg-white/70 border border-white rounded-3xl p-6 flex flex-col overflow-hidden shadow-xl">
+      <div className="col-span-12 lg:col-span-8 lg:row-span-3 bg-white/70 border border-white rounded-none p-6 flex flex-col overflow-hidden shadow-xl">
         <div className="flex items-center justify-between mb-8 shrink-0">
           <h3 className="text-xs font-bold text-black uppercase tracking-widest">
             Derivation Workflow
           </h3>
           {result?.isAccepted && (
-            <span className="text-[10px] bg-indigo-50 px-2 py-1 rounded text-black font-bold">
+            <span className="text-[10px] bg-blue-50 px-2 py-1 rounded-none text-[#023E8A] font-bold">
               {result.steps.length} CYCLES
             </span>
           )}
-          <ClipboardList className="w-4 h-4 text-slate-400" />
         </div>
 
         <div className="flex-grow overflow-y-auto pr-2 custom-scrollbar">
@@ -305,15 +307,15 @@ export default function CFGSimulatorUI() {
                   transition={{ delay: idx * 0.1 }}
                   className="flex items-center gap-4 group"
                 >
-                  <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center text-[10px] font-bold">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-none bg-black text-white flex items-center justify-center text-[10px] font-bold">
                     S{idx}
                   </div>
-                  <div className="flex-grow h-[1px] bg-slate-100 group-hover:bg-indigo-100 transition-colors"></div>
+                  <div className="flex-grow h-[1px] bg-slate-100 group-hover:bg-blue-100 transition-colors"></div>
                   <div
                     className={
-                      "text-sm px-3 py-1 rounded-xl border " +
+                      "text-sm px-3 py-1 rounded-none border " +
                       (idx === 0
-                        ? "bg-indigo-50 border-indigo-100 text-indigo-600 font-bold"
+                        ? "bg-blue-50 border-blue-100 text-[#023E8A] font-bold"
                         : idx === result.steps.length - 1
                         ? "bg-emerald-50 border-emerald-100 text-emerald-600 font-bold"
                         : "bg-white border-slate-100 text-slate-600")
@@ -343,12 +345,12 @@ export default function CFGSimulatorUI() {
       </div>
 
       {/* CFG Summary Bento Box */}
-      <div className="col-span-12 lg:col-span-4 lg:row-span-3 bg-white/70 border border-white rounded-3xl p-6 flex flex-col overflow-hidden">
+      <div className="col-span-12 lg:col-span-4 lg:row-span-3 bg-white/70 border border-white rounded-none p-6 flex flex-col overflow-hidden">
         <h3 className="text-xs font-bold text-black uppercase tracking-widest mb-6 shrink-0">
           Parsing Logic
         </h3>
         <div className="space-y-4 flex-grow overflow-y-auto pr-2 custom-scrollbar">
-          <div className="bg-white p-5 rounded-2xl border border-white/50">
+          <div className="bg-white p-5 rounded-none border border-white/50">
             <h4 className="text-[9px] font-bold text-black uppercase mb-3 tracking-widest">
               Grammar Metrics
             </h4>
@@ -366,7 +368,7 @@ export default function CFGSimulatorUI() {
             
             <div className="h-px bg-slate-800 my-4" />
             
-            <div className="bg-white p-3 rounded-xl border border-white/50">
+            <div className="bg-white p-3 rounded-none border border-white/50">
                 <p className="text-[10px] text-emerald-400 leading-relaxed font-bold">
                     STRUCTURAL_PARITY: 100% MATCH
                 </p>
@@ -381,9 +383,9 @@ export default function CFGSimulatorUI() {
             Mode: Sentential_Expansion
           </span>
           <div className="flex gap-1">
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-300"></div>
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-100"></div>
+            <div className="w-1.5 h-1.5 rounded-none bg-emerald-500"></div>
+            <div className="w-1.5 h-1.5 rounded-none bg-emerald-300"></div>
+            <div className="w-1.5 h-1.5 rounded-none bg-emerald-100"></div>
           </div>
         </div>
       </div>

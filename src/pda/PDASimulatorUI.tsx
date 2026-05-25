@@ -36,15 +36,15 @@ function StackView({ stack, bottomLabel }: StackViewProps) {
 
   return (
     <div 
-      className="h-full min-h-0 overflow-hidden rounded-3xl border border-white/50 bg-white/30 p-4"
+      className="h-full min-h-0 overflow-hidden rounded-none border border-white/50 bg-white/30 p-4"
     >
-      <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-slate-50/50 p-4">
+      <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-none border border-slate-200 bg-slate-50/50 p-4">
         <div
           ref={containerRef}
           className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden custom-scrollbar"
         >
           <div className="mx-auto flex w-full max-w-[210px] flex-col-reverse gap-3 items-center pb-3">
-            <div className="w-full rounded-xl border border-slate-200 bg-white py-3 text-center text-[10px] font-bold uppercase tracking-[0.35em] text-slate-400">
+            <div className="w-full rounded-none border border-slate-200 bg-white py-3 text-center text-[10px] font-bold uppercase tracking-[0.35em] text-slate-400">
               {bottomLabel}
             </div>
             <AnimatePresence initial={false}>
@@ -59,9 +59,9 @@ function StackView({ stack, bottomLabel }: StackViewProps) {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -16, scale: 0.96 }}
                       transition={{ duration: 0.22, ease: "easeInOut" }}
-                      className={`w-full rounded-xl border px-4 py-3 text-center text-lg font-bold tracking-[0.16em] ${
+                      className={`w-full rounded-none border px-4 py-3 text-center text-lg font-bold tracking-[0.16em] ${
                         isTop
-                          ? "bg-indigo-600 border-indigo-500 text-white shadow-xl shadow-indigo-200"
+                          ? "bg-[#0077B6] border-[#023E8A] text-white shadow-xl shadow-blue-200"
                           : "bg-white border-slate-200 text-slate-900 shadow-sm"
                       }`}
                     >
@@ -70,7 +70,7 @@ function StackView({ stack, bottomLabel }: StackViewProps) {
                   );
                 })
               ) : (
-                <div className="w-full rounded-xl border border-dashed border-slate-300 bg-white/50 py-10 text-center text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                <div className="w-full rounded-none border border-dashed border-slate-300 bg-white/50 py-10 text-center text-[10px] font-bold uppercase tracking-widest text-slate-400">
                   Empty
                 </div>
               )}
@@ -197,7 +197,7 @@ export default function PDASimulatorUI() {
 
   return (
     <div 
-      className="grid grid-cols-12 lg:grid-rows-6 gap-6 min-h-[700px] lg:h-[calc(100vh-200px)]"
+      className="grid grid-cols-12 lg:grid-rows-6 gap-6 min-h-[1000px] lg:h-[1050px]"
       style={{ fontFamily: "'Comfortaa', sans-serif" }}
     >
       <style>
@@ -205,7 +205,7 @@ export default function PDASimulatorUI() {
       </style>
 
       {/* Control Panel Bento Box */}
-      <div className="col-span-12 lg:col-span-4 lg:row-span-3 bg-white/70 border border-white rounded-3xl p-6 flex flex-col overflow-hidden">
+      <div className="col-span-12 lg:col-span-4 lg:row-span-2 bg-white/70 border border-white rounded-none p-6 flex flex-col overflow-hidden">
         <div className="flex items-center justify-between mb-4 shrink-0">
           <div className="flex items-center gap-2">
             <h3 className="text-[14px] font-semibold text-black uppercase tracking-widest">
@@ -220,24 +220,31 @@ export default function PDASimulatorUI() {
               <label className="block text-[10px] font-bold text-slate-600 uppercase mb-3 tracking-widest">
                 Select Regex Problem
               </label>
-              <div className="relative mb-6">
+              <div className="relative mb-4">
                 <select
                   value={regexInput}
                   onChange={(e) => setRegexInput(e.target.value)}
-                  className="w-full bg-white rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-blue transition-all text-xs text-black appearance-none cursor-pointer"
+                  className="w-full bg-white border border-slate-200/80 rounded-none px-5 py-4 focus:outline-none focus:ring-2 focus:ring-[#0077B6]/20 text-xs text-slate-800 appearance-none cursor-pointer hover:border-slate-300 transition-all font-medium pr-10"
                 >
                   <option value={REGEX_1}>
-                    Problem 1: (1+0)* (11+00) (00+11)* (1+0+11) (1+0+11)*
-                    (101+111) (101+111)* (1+0*+11) (1+0*+11)*
+                    Problem 1: (1+0)* (11+00)...
                   </option>
                   <option value={REGEX_2}>
-                    Problem 2: (bab)* (b+a) (bab+aba) (a+b)* (aa+bb)* (b+a+bb)
-                    (a+b)* (aa+bb)
+                    Problem 2: (bab)* (b+a)...
                   </option>
                 </select>
                 <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none">
-                  <ChevronRight className="w-4 h-4 text-slate-600 rotate-90" />
+                  <ChevronRight className="w-4 h-4 text-slate-500 rotate-90" />
                 </div>
+              </div>
+
+              {/* Premium Full View Expression Display Box */}
+              <div className="mb-6 p-4 bg-[#0077B6]/5 border border-[#0077B6]/10 text-[11px] text-slate-800 leading-relaxed font-bold break-words rounded-none">
+                <span className="text-[9px] uppercase tracking-widest text-[#0077B6] block mb-1">Full Selected Problem:</span>
+                {regexInput === REGEX_1 
+                  ? "Problem 1: (1+0)* (11+00) (00+11)* (1+0+11) (1+0+11)* (101+111) (101+111)* (1+0*+11) (1+0*+11)*"
+                  : "Problem 2: (bab)* (b+a) (bab+aba) (a+b)* (aa+bb)* (b+a+bb) (a+b)* (aa+bb)"
+                }
               </div>
 
               <label className="block text-[10px] font-bold text-slate-600 uppercase mb-3 tracking-widest">
@@ -252,9 +259,9 @@ export default function PDASimulatorUI() {
                   value={inputString}
                   onChange={handleInputChange}
                   placeholder={`Enter ${pda.alphabet.join("/")} stream...`}
-                  className="w-full bg-white border border-white/70 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-blue transition-all text-xs text-black appearance-none cursor-pointer"
+                  className="w-full bg-white border border-slate-200/80 rounded-none px-5 py-4 focus:outline-none focus:ring-2 focus:ring-[#0077B6]/20 text-xs text-slate-800 appearance-none hover:border-slate-300 transition-all font-medium"
                 />
-                <Terminal className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-700" />
+                <Terminal className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
               </div>
             </div>
 
@@ -269,7 +276,7 @@ export default function PDASimulatorUI() {
                       key={sample}
                       type="button"
                       onClick={() => setInputString(sample)}
-                      className="rounded-2xl bg-black border border-white/70 px-3 py-2 text-xs text-emerald-500 transition"
+                      className="rounded-none bg-white border border-emerald-200/60 px-3.5 py-2.5 text-xs text-emerald-700 font-bold hover:bg-emerald-50/80 hover:text-emerald-800 hover:border-emerald-400 hover:shadow-sm transition-all duration-200 cursor-pointer"
                     >
                       {sample}
                     </button>
@@ -287,7 +294,7 @@ export default function PDASimulatorUI() {
                       key={sample}
                       type="button"
                       onClick={() => setInputString(sample)}
-                      className="rounded-2xl bg-black border border-white/70 px-3 py-2 text-xs text-rose-500 transition"
+                      className="rounded-none bg-white border border-rose-200/60 px-3.5 py-2.5 text-xs text-rose-700 font-bold hover:bg-rose-50/80 hover:text-rose-800 hover:border-rose-400 hover:shadow-sm transition-all duration-200 cursor-pointer"
                     >
                       {sample}
                     </button>
@@ -302,20 +309,20 @@ export default function PDASimulatorUI() {
           <button
             onClick={run}
             disabled={isFinished}
-            className="flex-1 bg-emerald-700 hover:bg-emerald-400 text-white py-3 rounded-full flex items-center justify-center gap-2 text-xs font-bold shadow-lg shadow-indigo-600/20 disabled:opacity-30 transition-all"
+            className="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white py-3 px-6 rounded-none flex items-center justify-center gap-2 text-xs font-bold shadow-md shadow-emerald-600/10 hover:shadow-lg disabled:opacity-30 transition-all duration-200 cursor-pointer"
           >
             <Play className="w-4 h-4 fill-white" /> RUN
           </button>
           <button
             onClick={step}
             disabled={isFinished}
-            className="bg-[#212121] text-white rounded-full p-3 border transition-all hover:bg-emerald-500 disabled:opacity-30"
+            className="bg-white border border-slate-200 text-slate-700 rounded-none p-3.5 transition-all duration-200 hover:bg-blue-50 hover:text-[#0077B6] hover:border-blue-200 shadow-sm disabled:opacity-30 cursor-pointer"
           >
             <StepForward className="w-5 h-5" />
           </button>
           <button
             onClick={reset}
-            className="bg-[#212121] text-white rounded-full p-3 border transition-all hover:bg-emerald-500"
+            className="bg-white border border-slate-200 text-slate-700 rounded-none p-3.5 transition-all duration-200 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 shadow-sm cursor-pointer"
           >
             <RotateCcw className="w-5 h-5" />
           </button>
@@ -323,20 +330,18 @@ export default function PDASimulatorUI() {
       </div>
 
       {/* State Visualizer Bento Box */}
-      <div className="col-span-12 lg:col-span-8 lg:row-span-4 bg-white/70 border border-white rounded-3xl overflow-hidden relative shadow-2xl p-6 pt-16">
-        <div className="absolute top-6 left-6 z-10">
+      <div className="col-span-12 lg:col-span-8 lg:row-span-4 bg-white/70 border border-white rounded-none overflow-hidden relative shadow-2xl p-6 pt-16">
+        <div className="absolute top-6 left-6 right-6 z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-100 pb-3">
           <h3 className="text-xs font-bold text-black uppercase tracking-widest">
-            Network Architecture
+            State Visualization
           </h3>
-        </div>
-
-        {currentStateId && (
-          <div className="absolute top-6 right-6 z-10">
-            <span className="text-[10px] bg-white px-3 py-1 rounded-full text-black font-bold border border-white/70">
-              ACTIVE: {currentStateId}
-            </span>
+          <div className="flex flex-wrap gap-x-4 gap-y-1 text-[10px] text-slate-500 font-bold uppercase tracking-wider">
+            <span>States: <span className="text-[#0077B6]">{pda.states.length}</span></span>
+            <span>Alphabet: <span className="text-[#0077B6]">{"{"}{pda.alphabet.join(", ")}{"}"}</span></span>
+            <span>Transitions: <span className="text-[#0077B6]">{pda.transitions.length}</span></span>
+            <span>Accept: <span className="text-[#0077B6]">{pda.states.filter((s) => s.isAccept).map((s) => s.id).join(", ")}</span></span>
           </div>
-        )}
+        </div>
 
         <div className="flex items-center justify-center h-full">
           <D3Graph
@@ -349,18 +354,18 @@ export default function PDASimulatorUI() {
             activeStateId={currentStateId}
             activeTransitionIdx={activeTransitionIdx}
             width={750}
-            height={400}
+            height={600}
           />
         </div>
       </div>
 
       {/* Stack View Bento Box */}
-      <div className="col-span-12 lg:col-span-4 lg:row-span-3 bg-white/70 border border-white rounded-3xl p-6 flex flex-col overflow-hidden">
+      <div className="col-span-12 lg:col-span-4 lg:row-span-2 bg-white/70 border border-white rounded-none p-6 flex flex-col overflow-hidden">
         <div className="flex items-center justify-between mb-4 shrink-0">
           <h3 className="text-xs font-bold text-black uppercase tracking-widest">
             Stack Memory
           </h3>
-          <span className="text-[10px] bg-indigo-50 px-2 py-1 rounded-lg text-black font-bold">
+          <span className="text-[10px] bg-blue-50 px-2 py-1 rounded-none text-[#023E8A] font-bold">
             DEPTH: {stack.length}
           </span>
         </div>
@@ -368,19 +373,19 @@ export default function PDASimulatorUI() {
       </div>
 
       {/* Operational Trace Bento Box */}
-      <div className="col-span-12 lg:col-span-8 lg:row-span-2 bg-white/70 border border-white rounded-3xl p-6 flex flex-col overflow-hidden">
+      <div className="col-span-12 lg:col-span-12 lg:row-span-2 bg-white/70 border border-white rounded-none p-6 flex flex-col overflow-hidden">
         <div className="flex items-center justify-between mb-4 shrink-0">
           <h3 className="text-xs font-bold text-black uppercase tracking-widest">
             Operational Trace
           </h3>
           <div
             className={
-              "px-4 py-2 rounded-2xl border transition-all duration-300 flex items-center gap-3 " +
+              "px-4 py-2 rounded-none border transition-all duration-300 flex items-center gap-3 " +
               (isFinished
                 ? isAccepted
-                  ? "bg-emerald-500/10 border-emerald-500/30"
-                  : "bg-rose-500/10 border-rose-500/30"
-                : "bg-slate-950 border-slate-800")
+                  ? "bg-emerald-50 border-emerald-200"
+                  : "bg-rose-50 border-rose-200"
+                : "bg-slate-100 border-slate-200")
             }
           >
             <span
@@ -388,9 +393,9 @@ export default function PDASimulatorUI() {
                 "text-[10px] font-black tracking-widest " +
                 (isFinished
                   ? isAccepted
-                    ? "text-emerald-500"
-                    : "text-rose-400"
-                  : "text-black")
+                    ? "text-emerald-600"
+                    : "text-rose-600"
+                  : "text-slate-600")
               }
             >
               {isFinished
@@ -407,9 +412,9 @@ export default function PDASimulatorUI() {
               ))}
           </div>
         </div>
-        <div className="text-[11px] flex-grow overflow-y-auto pr-4 custom-scrollbar bg-[#212121] p-4 rounded-2xl border border-[#212121]">
+        <div className="text-[11px] flex-grow overflow-y-auto pr-4 custom-scrollbar bg-slate-50 border border-slate-200/80 p-4 rounded-none">
           {history.length === 0 ? (
-            <p className="text-slate-600 uppercase tracking-widest text-[10px]">
+            <p className="text-slate-400 uppercase tracking-widest text-[10px]">
               Waiting for processor initialization...
             </p>
           ) : (
@@ -421,7 +426,7 @@ export default function PDASimulatorUI() {
                 className={
                   "leading-relaxed " + 
                   (idx === history.length - 1
-                    ? "text-indigo-400 font-bold"
+                    ? "text-[#0077B6] font-bold"
                     : "text-slate-500")
                 }
               >

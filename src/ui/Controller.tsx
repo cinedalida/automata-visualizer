@@ -29,7 +29,7 @@ export default function Controller() {
       
       {/* HEADER: Exactly #212121 with Navigation on the right */}
       <header className="bg-[#212121] shadow-xl relative z-50">
-        <div className="relative z-10 max-w-[1400px] mx-auto px-8 py-4 flex flex-row items-center justify-between gap-4">
+        <div className="relative z-10 max-w-[1550px] mx-auto px-8 py-4 flex flex-row items-center justify-between gap-4">
           <div className="flex flex-col gap-1">
              <h1 className="text-4xl md:text-5xl tracking-tighter uppercase leading-none flex gap-x-4">
                 <span className="relative">
@@ -86,7 +86,7 @@ export default function Controller() {
         }}
       >
         <div className="absolute inset-0 bg-black/10 pointer-events-none"></div>
-        <div className="max-w-7xl mx-auto relative z-10">
+        <div className="max-w-[1550px] mx-auto relative z-10">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}

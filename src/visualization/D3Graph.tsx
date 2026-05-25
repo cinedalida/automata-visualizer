@@ -61,7 +61,7 @@ const D3Graph: React.FC<D3GraphProps> = ({
       .attr("orient", "auto")
       .append("path")
       .attr("d", "M0,-5L10,0L0,5")
-      .attr("fill", "#4b5563");
+      .attr("fill", "#94a3b8");
 
     svg
       .append("defs")
@@ -75,7 +75,7 @@ const D3Graph: React.FC<D3GraphProps> = ({
       .attr("orient", "auto")
       .append("path")
       .attr("d", "M0,-5L10,0L0,5")
-      .attr("fill", "#6366f1");
+      .attr("fill", "#0077B6");
 
     // Simulation nodes and links
     const nodes = states.map((s) => ({ ...s }));
@@ -122,7 +122,7 @@ const D3Graph: React.FC<D3GraphProps> = ({
       .enter()
       .append("path")
       .attr("class", "transition-path")
-      .attr("stroke", (d: any) => (d.isActive ? "#6366f1" : "#1e293b"))
+      .attr("stroke", (d: any) => (d.isActive ? "#0077B6" : "#94a3b8"))
       .attr("stroke-width", (d: any) => (d.isActive ? 3 : 2))
       .attr("fill", "none")
       .attr("marker-end", (d: any) =>
@@ -147,7 +147,7 @@ const D3Graph: React.FC<D3GraphProps> = ({
             .attr("dy", i === 0 ? 0 : "1.1em")
             .attr(
               "fill",
-              label.active ? "#818cf8" : d.isActive ? "#334155" : "#64748b",
+              label.active ? "#023E8A" : d.isActive ? "#334155" : "#475569",
             )
             .attr("font-weight", label.active ? "bold" : "normal")
             .attr("opacity", label.active ? 1 : d.isActive ? 0.3 : 1)
@@ -167,12 +167,13 @@ const D3Graph: React.FC<D3GraphProps> = ({
       const isActive = d.id === activeStateId;
       const shape = d.shape || "circle";
 
-      const fillColor = isActive ? "#6366f1" : "#0f172a";
-      const strokeColor = isActive
-        ? "#818cf8"
-        : d.isAccept
-          ? "#10b981"
-          : "#334155";
+      const fillColor = d.isAccept
+        ? (isActive ? "#10b981" : "#e6f4ea")
+        : (isActive ? "#0077B6" : "#f1f5f9");
+
+      const strokeColor = d.isAccept
+        ? (isActive ? "#047857" : "#059669")
+        : (isActive ? "#023E8A" : "#64748b");
       const strokeWidth = d.isAccept ? 3 : 2;
 
       if (shape === "rounded") {
@@ -184,8 +185,8 @@ const D3Graph: React.FC<D3GraphProps> = ({
           .attr("y", -22)
           .attr("width", 90)
           .attr("height", 44)
-          .attr("rx", 14)
-          .attr("ry", 14)
+          .attr("rx", 0)
+          .attr("ry", 0)
           .attr("fill", fillColor)
           .attr("stroke", strokeColor)
           .attr("stroke-width", strokeWidth)
@@ -198,10 +199,10 @@ const D3Graph: React.FC<D3GraphProps> = ({
             .attr("y", -16)
             .attr("width", 78)
             .attr("height", 32)
-            .attr("rx", 10)
-            .attr("ry", 10)
+            .attr("rx", 0)
+            .attr("ry", 0)
             .attr("fill", "none")
-            .attr("stroke", "#10b981")
+            .attr("stroke", isActive ? "#ffffff" : "#059669")
             .attr("stroke-width", 1);
         }
       } else if (shape === "diamond") {
@@ -230,7 +231,7 @@ const D3Graph: React.FC<D3GraphProps> = ({
           el.append("circle")
             .attr("r", 16)
             .attr("fill", "none")
-            .attr("stroke", "#10b981")
+            .attr("stroke", isActive ? "#ffffff" : "#059669")
             .attr("stroke-width", 1);
         }
       }
@@ -247,7 +248,7 @@ const D3Graph: React.FC<D3GraphProps> = ({
       .attr("text-anchor", "middle")
       .attr("dy", 5)
       .attr("fill", (d: any) =>
-        d.id === activeStateId ? "#ffffff" : "#94a3b8",
+        d.id === activeStateId ? "#ffffff" : "#1e293b",
       )
       .attr("font-size", (d: any) => {
         // Smaller font for longer labels like "START" and "ACCEPT"
@@ -287,7 +288,7 @@ const D3Graph: React.FC<D3GraphProps> = ({
         if (shape === "diamond") return "M -45 0 L -36 0";
         return "M -40 0 L -25 0";
       })
-      .attr("stroke", "#475569")
+      .attr("stroke", "#64748b")
       .attr("stroke-width", 2)
       .attr("marker-end", "url(#arrowhead)");
 
@@ -401,26 +402,26 @@ const D3Graph: React.FC<D3GraphProps> = ({
   };
 
   return (
-    <div className="w-full h-full bg-slate-950 rounded-3xl overflow-hidden relative">
+    <div className="w-full h-full bg-slate-50/50 rounded-none overflow-hidden relative border border-slate-100/50 shadow-inner">
       {/* Zoom Controls */}
       <div className="absolute top-4 right-4 z-10 flex gap-2">
         <button
           onClick={handleZoomIn}
-          className="bg-slate-800 hover:bg-slate-700 text-white rounded-lg p-2 transition-colors text-sm font-bold"
+          className="bg-white border border-slate-200 text-slate-700 rounded-none p-2.5 transition-all text-xs font-bold hover:bg-blue-50 hover:text-[#0077B6] hover:border-blue-200 shadow-sm cursor-pointer"
           title="Zoom In"
         >
           +
         </button>
         <button
           onClick={handleZoomOut}
-          className="bg-slate-800 hover:bg-slate-700 text-white rounded-lg p-2 transition-colors text-sm font-bold"
+          className="bg-white border border-slate-200 text-slate-700 rounded-none p-2.5 transition-all text-xs font-bold hover:bg-blue-50 hover:text-[#0077B6] hover:border-blue-200 shadow-sm cursor-pointer"
           title="Zoom Out"
         >
           −
         </button>
         <button
           onClick={handleResetZoom}
-          className="bg-slate-800 hover:bg-slate-700 text-white rounded-lg px-3 py-2 transition-colors text-xs"
+          className="bg-white border border-slate-200 text-slate-700 rounded-none px-3.5 py-2.5 transition-all text-[11px] hover:bg-blue-50 hover:text-[#0077B6] hover:border-blue-200 shadow-sm cursor-pointer font-bold"
           title="Reset Zoom"
         >
           Reset

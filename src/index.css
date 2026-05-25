@@ -191,7 +191,20 @@ button, input, select, textarea, pre, code {
     text-shadow: 2px 2px 0px rgba(0,0,0,0.8);
   }
 
-
-
+  /* Custom Scrollbar styled for Ocean Blue theme with sharp edges */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #0077B6;
+    border-radius: 0px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #023E8A;
+  }
 
 }
