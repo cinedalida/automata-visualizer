@@ -149,20 +149,24 @@ automata-visualizer/
 ### Development Scripts
 
 * **Launch local server**:
+
   ```bash
   npm run dev
   ```
 
   Open `http://localhost:3000` in your web browser.
 * **Build production package**:
+
   ```bash
   npm run build
   ```
 * **Preview production build**:
+
   ```bash
   npm run preview
   ```
 * **TypeScript compile-time dry-run check**:
+
   ```bash
   npm run lint
   ```
@@ -191,3 +195,11 @@ This project was built for **Subject: AUTOMATA THEORY AND FORMAL LANGUAGES (S-CS
 * **Criselda Perdito** — Responsive Frontend & UI Animations
 * **Kyle Panganiban** — Responsive Frontend & UI Animations
 * **Rona Dalistan** — Technical Documentation & QA Testing
+
+---
+
+## Pictures
+
+### Website Demo
+
+![Website Demo](src/images/website-demo.png)
