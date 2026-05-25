@@ -3,6 +3,7 @@ import { CFG } from "../types";
 export interface DerivationResult {
   steps: string[];
   isAccepted: boolean;
+  matchedLength?: number;
 }
 
 export class CFGEngine {
@@ -114,6 +115,9 @@ export class CFGEngine {
     const maxSteps = 50000;
     let stepsCount = 0;
 
+    let bestDerivation: string[] = [this.cfg.startSymbol];
+    let maxMatchedLength = 0;
+
     while (queue.length > 0 && stepsCount < maxSteps) {
       stepsCount++;
       const current = queue.shift()!;
@@ -125,6 +129,7 @@ export class CFGEngine {
         return {
           steps: current.derivation,
           isAccepted: true,
+          matchedLength: input.length,
         };
       }
 
@@ -132,6 +137,26 @@ export class CFGEngine {
       // Find the leftmost variable to expand
       // --------------------------------------------------------
       const leftmost = this.findLeftmostVariable(current.sentential);
+
+      // Calculate prefix and matched length
+      const terminalPrefix = leftmost === null ? current.sentential : current.sentential.slice(0, leftmost.index);
+      let matchedLength = 0;
+      if (leftmost === null) {
+        while (
+          matchedLength < current.sentential.length &&
+          matchedLength < input.length &&
+          current.sentential[matchedLength] === input[matchedLength]
+        ) {
+          matchedLength++;
+        }
+      } else {
+        matchedLength = terminalPrefix.length;
+      }
+
+      if (matchedLength > maxMatchedLength) {
+        maxMatchedLength = matchedLength;
+        bestDerivation = current.derivation;
+      }
 
       // No variables left but didn't match input → dead end
       if (leftmost === null) continue;
@@ -143,7 +168,6 @@ export class CFGEngine {
       // If the terminals before the first variable don't match
       // the beginning of the input, this path is already wrong.
       // --------------------------------------------------------
-      const terminalPrefix = current.sentential.slice(0, varIndex);
       if (!input.startsWith(terminalPrefix)) continue;
 
       // --------------------------------------------------------
@@ -196,6 +220,7 @@ export class CFGEngine {
               return {
                 steps: [...current.derivation, nextSentential],
                 isAccepted: true,
+                matchedLength: input.length,
               };
             }
             // All terminals but wrong string → dead end
@@ -212,10 +237,13 @@ export class CFGEngine {
 
     // --------------------------------------------------------
     // Exhausted search or hit step limit → reject
+    // But return the best-effort derivation trace so the UI
+    // can show exactly where parsing failed!
     // --------------------------------------------------------
     return {
-      steps: [],
+      steps: bestDerivation,
       isAccepted: false,
+      matchedLength: maxMatchedLength,
     };
   }
 }

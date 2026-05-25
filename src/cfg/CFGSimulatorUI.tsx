@@ -244,7 +244,7 @@ export default function CFGSimulatorUI() {
       <div className="col-span-12 lg:col-span-8 lg:row-span-3 bg-white/70 border border-white rounded-none p-6 shadow-2xl relative overflow-hidden">
         <div className="relative z-10 h-full min-h-0">
           <h3 className="text-xs font-bold text-black uppercase tracking-widest mb-6">
-            Formal Grammar Definition (G)
+            GRAMMAR
           </h3>
           <div className="h-full min-h-0 overflow-y-auto pr-2 custom-scrollbar">
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -281,6 +281,11 @@ export default function CFGSimulatorUI() {
           {result?.isAccepted && (
             <span className="text-[10px] bg-blue-50 px-2 py-1 rounded-none text-[#023E8A] font-bold">
               {result.steps.length} CYCLES
+            </span>
+          )}
+          {result && !result.isAccepted && (
+            <span className="text-[10px] bg-rose-50 px-2 py-1 rounded-none text-rose-700 font-bold">
+              FAILED AT CYCLE {result.steps.length - 1}
             </span>
           )}
         </div>
@@ -327,11 +332,64 @@ export default function CFGSimulatorUI() {
               ))}
             </div>
           ) : result ? (
-            <div className="flex flex-col items-center justify-center h-full gap-4 opacity-50">
-              <AlertCircle className="w-12 h-12 text-rose-500" />
-              <span className="text-rose-400 text-xs font-bold uppercase tracking-widest">
-                Parsing Exception
-              </span>
+            <div className="flex flex-col gap-6">
+              {result.steps.length > 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                  {result.steps.map((step, idx) => (
+                    <motion.div
+                      key={idx}
+                      initial={{ opacity: 0, y: 5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.05 }}
+                      className="flex items-center gap-4 group"
+                    >
+                      <div className="flex-shrink-0 w-8 h-8 rounded-none bg-slate-800 text-white flex items-center justify-center text-[10px] font-bold">
+                        S{idx}
+                      </div>
+                      <div className="flex-grow h-[1px] bg-slate-100 group-hover:bg-rose-100 transition-colors"></div>
+                      <div
+                        className={
+                          "text-sm px-3 py-1 rounded-none border " +
+                          (idx === 0
+                            ? "bg-blue-50 border-blue-100 text-[#023E8A] font-bold"
+                            : idx === result.steps.length - 1
+                            ? "bg-rose-50 border-rose-200 text-rose-600 font-bold"
+                            : "bg-white border-slate-100 text-slate-600")
+                        }
+                      >
+                        {step === "" ? "ε" : step}
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
+
+              {/* Premium Compiler Diagnostics Console */}
+              <div className="p-5 bg-rose-50 border border-rose-200 text-slate-800 rounded-none shrink-0">
+                <div className="flex items-center gap-3 text-rose-600 mb-4">
+                  <AlertCircle className="w-5 h-5 shrink-0" />
+                  <span className="text-[10px] font-black uppercase tracking-widest leading-none">
+                    COMPILER ERROR: PARSING_EXCEPTION
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-bold text-slate-700">
+                  <div className="p-3 bg-white border border-slate-100">
+                    <span className="text-slate-400 text-[9px] uppercase block tracking-widest font-normal mb-1">Parsed Portion:</span>
+                    <span className="text-emerald-600 font-mono text-xs break-all">
+                      {inputString.slice(0, result.matchedLength) || "ε (None)"}
+                    </span>
+                  </div>
+                  <div className="p-3 bg-white border border-slate-100">
+                    <span className="text-slate-400 text-[9px] uppercase block tracking-widest font-normal mb-1">Unexpected Suffix/Token:</span>
+                    <span className="text-rose-600 font-mono text-xs break-all">
+                      {inputString.slice(result.matchedLength) ? `"${inputString.slice(result.matchedLength)}"` : "EOF (End of File)"}
+                    </span>
+                  </div>
+                </div>
+                <p className="text-[10px] text-slate-500 font-medium leading-relaxed mt-4 pt-3 border-t border-rose-100">
+                  The compiler successfully parsed the green prefix but encountered a syntax mismatch with the remaining red suffix. No valid productions from the active variables in state <span className="font-bold text-slate-800">"{result.steps[result.steps.length - 1] || cfg.startSymbol}"</span> can derive the rest of the target string.
+                </p>
+              </div>
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center h-full gap-4 text-slate-300">
@@ -364,17 +422,6 @@ export default function CFGSimulatorUI() {
               <p className="text-[11px] text-black">
                 Complexity: <span className="text-black">Type 2 (CFG)</span>
               </p>
-            </div>
-            
-            <div className="h-px bg-slate-800 my-4" />
-            
-            <div className="bg-white p-3 rounded-none border border-white/50">
-                <p className="text-[10px] text-emerald-400 leading-relaxed font-bold">
-                    STRUCTURAL_PARITY: 100% MATCH
-                </p>
-                <p className="text-[9px] text-black mt-1">
-                    Grammar verified against mapped {selectedCfgKey === "cfg1" ? "DFA1" : "DFA2"} structure.
-                </p>
             </div>
           </div>
         </div>
