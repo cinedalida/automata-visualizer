@@ -4,6 +4,7 @@ import { Terminal, Activity, Layers } from "lucide-react";
 import DFASimulatorUI from "../dfa/DFASimulatorUI";
 import PDASimulatorUI from "../pda/PDASimulatorUI";
 import CFGSimulatorUI from "../cfg/CFGSimulatorUI";
+import wallpaperImage from "../images/mc_wallpaper_movie_vista_1920x1080.png";
 
 type Tab = "DFA" | "PDA" | "CFG";
 
@@ -20,7 +21,7 @@ export default function Controller() {
     <div
       className="min-h-screen bg-dirt-full font-minecraft relative"
       style={{
-        backgroundImage: "url('/mc_wallpaper_movie_vista_1920x1080.png')",
+        backgroundImage: `url(${wallpaperImage})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
@@ -78,7 +79,7 @@ export default function Controller() {
       <main
         className="relative min-h-[calc(100vh-120px)] p-4 md:p-8 z-10"
         style={{
-          backgroundImage: `url('/src/images/mc_wallpaper_movie_vista_1920x1080.png')`,
+          backgroundImage: `url(${wallpaperImage})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
