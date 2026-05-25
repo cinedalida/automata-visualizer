@@ -68,7 +68,7 @@ export default function GraphView({
                 <path
                   d={`M ${from.x} ${from.y - 20} C ${from.x - 40} ${from.y - 80}, ${from.x + 40} ${from.y - 80}, ${from.x} ${from.y - 20}`}
                   fill="none"
-                  stroke={isActive ? '#6366f1' : '#334155'}
+                  stroke={isActive ? '#0077B6' : '#334155'}
                   strokeWidth="2"
                   markerEnd={`url(#${isActive ? 'arrowhead-active' : 'arrowhead'})`}
                 />
@@ -76,7 +76,7 @@ export default function GraphView({
                   x={from.x}
                   y={from.y - 85}
                   textAnchor="middle"
-                  className={`text-[10px] font-mono ${isActive ? 'fill-indigo-400 font-bold' : 'fill-slate-500'}`}
+                  className={`text-[10px] font-mono ${isActive ? 'fill-sky-400 font-bold' : 'fill-slate-500'}`}
                 >
                   {symbol}
                 </text>
@@ -118,7 +118,7 @@ export default function GraphView({
               <motion.path
                 d={pathD}
                 fill="none"
-                stroke={isActive ? '#6366f1' : '#334155'}
+                stroke={isActive ? '#0077B6' : '#334155'}
                 strokeWidth="2"
                 markerEnd={`url(#${isActive ? 'arrowhead-active' : 'arrowhead'})`}
                 initial={{ pathLength: 0 }}
@@ -128,7 +128,7 @@ export default function GraphView({
                 x={textX}
                 y={textY}
                 textAnchor="middle"
-                className={`text-[10px] font-mono ${isActive ? 'fill-indigo-400 font-bold' : 'fill-slate-500'}`}
+                className={`text-[10px] font-mono ${isActive ? 'fill-sky-400 font-bold' : 'fill-slate-500'}`}
               >
                 {symbol}
               </text>
@@ -155,7 +155,7 @@ export default function GraphView({
                 r="25"
                 className={`${
                   isActive 
-                    ? 'fill-indigo-600 stroke-indigo-400' 
+                    ? 'fill-[#0077B6] stroke-sky-400' 
                     : s.isAccept 
                       ? 'fill-emerald-900/40 stroke-emerald-500' 
                       : 'fill-slate-800 stroke-slate-700'

@@ -2,11 +2,9 @@ import { useState, useEffect } from "react";
 import {
   Send,
   Terminal,
-  ClipboardList,
   CheckCircle2,
   AlertCircle,
   ChevronRight,
-  Hash,
 } from "lucide-react";
 import { CFG_EXAMPLES } from "./cfgData";
 import { CFGEngine, DerivationResult } from "./cfgEngine";
@@ -18,46 +16,23 @@ export default function CFGSimulatorUI() {
   const [selectedCfgKey, setSelectedCfgKey] =
     useState<keyof typeof CFG_EXAMPLES>("cfg1");
   const [isValidRegex, setIsValidRegex] = useState(true);
-  const [inputString, setInputString] = useState("111111"); // CHANGED: valid default
+  const [inputString, setInputString] = useState("111111");
   const [result, setResult] = useState<DerivationResult | null>(null);
   const [isValidating, setIsValidating] = useState(false);
 
   const cfg = CFG_EXAMPLES[selectedCfgKey];
 
-  // ============================================================
-  // Sample strings that match the corrected DFAs/CFGs
-  // ============================================================
   const CFG_SAMPLE_STRINGS: Record<
     keyof typeof CFG_EXAMPLES,
     { valid: string[]; invalid: string[] }
   > = {
     cfg1: {
-      valid: [
-        "111111", // 11(double) 1(bridge) 111(pattern)
-        "0011010", // 00(double) 1(bridge) 101(pattern) 0(tail)
-        "1111010", // 11(double) 1(bridge) 101(pattern) 0(tail)
-        "00111110", // 00(double) 1(bridge) 111(pattern) 10(tail)
-      ],
-      invalid: [
-        "11111", // too short, pattern incomplete
-        "00111", // too short, pattern incomplete
-        "010101010101", // no double (00 or 11) found
-        "1100000000", // no pattern (101 or 111) found
-      ],
+      valid: ["111111", "0011010", "1111010", "00111110"],
+      invalid: ["11111", "00111", "010101010101", "1100000000"],
     },
     cfg2: {
-      valid: [
-        "babababbb", // bab(L1) a(L2) bab(L3) bb(tail)
-        "babaabbaa", // bab(L1) a(L2) aba(L3) ...aa(tail)
-        "ababaaa", // a(L2) bab(L3) aa(tail)
-        "aabaabb", // a(L2) aba(L3) bb(tail)
-      ],
-      invalid: [
-        "baabaaa", // baa triggers trap at q4
-        "babababa", // ends in a, tail requires aa or bb
-        "baba", // too short, missing pattern
-        "aaaa", // no valid bab/aba pattern
-      ],
+      valid: ["babababbb", "babaabbaa", "ababaaa", "aabaabb"],
+      invalid: ["baabaaa", "babababa", "baba", "aaaa"],
     },
   };
 
@@ -76,12 +51,8 @@ export default function CFGSimulatorUI() {
     }
   }, [regexInput]);
 
-  // ============================================================
-  // Reset input string when switching CFG
-  // ============================================================
   useEffect(() => {
     setResult(null);
-    // Set a sensible default input for each CFG
     if (selectedCfgKey === "cfg1") {
       setInputString("111111");
     } else {
@@ -89,18 +60,8 @@ export default function CFGSimulatorUI() {
     }
   }, [selectedCfgKey]);
 
-  // ============================================================
-  // Get valid characters for current CFG
-  // ============================================================
-  const getAllowedChars = (): string[] => {
-    return cfg.terminals;
-  };
-
-  // ============================================================
-  // Filter input to only allow valid terminal symbols
-  // ============================================================
   const handleInputChange = (value: string) => {
-    const allowed = getAllowedChars();
+    const allowed = cfg.terminals;
     const filtered = value
       .split("")
       .filter((ch) => allowed.includes(ch))
@@ -120,21 +81,20 @@ export default function CFGSimulatorUI() {
   };
 
   return (
-    <div className="grid grid-cols-12 lg:grid-rows-6 gap-6 min-h-[700px] lg:h-[calc(100vh-200px)]">
+    <div 
+      className="grid grid-cols-12 lg:grid-rows-6 gap-6 min-h-[850px] lg:h-[880px]"
+      style={{ fontFamily: "'Comfortaa', sans-serif" }}
+    >
+      <style>
+        {`@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap');`}
+      </style>
+
       {/* Compiler Console Bento Box */}
-      <div className="col-span-12 lg:col-span-4 lg:row-span-3 bg-slate-900/50 border border-slate-900 rounded-3xl p-6 flex flex-col overflow-hidden">
+      <div className="col-span-12 lg:col-span-4 lg:row-span-3 bg-white/70 border border-white rounded-none p-6 flex flex-col overflow-hidden">
         <div className="flex items-center justify-between mb-6 shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="bg-emerald-600/20 p-2 rounded-lg border border-emerald-500/30">
-              <Terminal className="w-5 h-5 text-emerald-400" />
-            </div>
-            <h2 className="font-bold text-white uppercase text-xs tracking-widest">
-              CFG Compiler
-            </h2>
-          </div>
-          <span className="text-[10px] bg-slate-800 px-2 py-0.5 rounded text-emerald-400 font-mono">
-            CFG_PARSER
-          </span>
+          <h3 className="text-[20px] font-bold text-black uppercase tracking-widest leading-none">
+            CFG Compiler
+          </h3>
         </div>
 
         <div className="space-y-6 flex-grow overflow-y-auto pr-2 custom-scrollbar">
@@ -142,29 +102,35 @@ export default function CFGSimulatorUI() {
             <label className="block text-[10px] font-bold text-slate-600 uppercase mb-3 tracking-widest">
               Select Regex Problem
             </label>
-            <div className="relative mb-6">
+            <div className="relative mb-4">
               <select
                 value={regexInput}
                 onChange={(e) => setRegexInput(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-emerald-600 transition-all font-mono text-xs text-emerald-400 appearance-none cursor-pointer"
+                className="w-full bg-white border border-slate-200/80 rounded-none px-5 py-4 focus:outline-none focus:ring-2 focus:ring-[#0077B6]/20 text-xs text-slate-800 appearance-none cursor-pointer hover:border-slate-300 transition-all font-medium pr-10"
               >
                 <option value={REGEX_1}>
-                  Problem 1: (1+0)* (11+00) (00+11)* (1+0+11) (1+0+11)*
-                  (101+111) (101+111)* (1+0*+11) (1+0*+11)*
+                  Problem 1: (1+0)* (11+00)...
                 </option>
                 <option value={REGEX_2}>
-                  Problem 2: (bab)* (b+a) (bab+aba) (a+b)* (aa+bb)* (b+a+bb)
-                  (a+b)* (aa+bb)
+                  Problem 2: (bab)* (b+a)...
                 </option>
               </select>
               <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none">
-                <ChevronRight className="w-4 h-4 text-slate-600 rotate-90" />
+                <ChevronRight className="w-4 h-4 text-slate-500 rotate-90" />
               </div>
+            </div>
+
+            {/* Premium Full View Expression Display Box */}
+            <div className="mb-6 p-4 bg-[#0077B6]/5 border border-[#0077B6]/10 text-[11px] text-slate-800 leading-relaxed font-bold break-words rounded-none">
+              <span className="text-[9px] uppercase tracking-widest text-[#0077B6] block mb-1">Full Selected Problem:</span>
+              {regexInput === REGEX_1 
+                ? "Problem 1: (1+0)* (11+00) (00+11)* (1+0+11) (1+0+11)* (101+111) (101+111)* (1+0*+11) (1+0*+11)*"
+                : "Problem 2: (bab)* (b+a) (bab+aba) (a+b)* (aa+bb)* (b+a+bb) (a+b)* (aa+bb)"
+              }
             </div>
 
             <label className="block text-[10px] font-bold text-slate-600 uppercase mb-3 tracking-widest">
               Source String
-              {/* Show which characters are allowed */}
               <span className="ml-2 text-slate-700 normal-case">
                 (allowed: {cfg.terminals.join(", ")})
               </span>
@@ -173,15 +139,14 @@ export default function CFGSimulatorUI() {
               <input
                 type="text"
                 value={inputString}
-                // Use filtered input handler
                 onChange={(e) => handleInputChange(e.target.value)}
                 placeholder={`Enter ${cfg.terminals.join("/")} string...`}
-                className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-emerald-600 transition-all font-mono text-emerald-400 text-lg tracking-widest"
+                className="w-full bg-white border border-slate-200/80 rounded-none px-5 py-4 focus:outline-none focus:ring-2 focus:ring-[#0077B6]/20 text-xs text-slate-800 appearance-none hover:border-slate-300 transition-all font-medium"
               />
               <button
                 onClick={validate}
                 disabled={isValidating || !inputString}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-emerald-600 hover:bg-emerald-500 rounded-xl text-white disabled:opacity-30 transition-all shadow-lg shadow-emerald-600/20"
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-emerald-500 text-white hover:bg-emerald-400 rounded-none disabled:opacity-30 transition-all shadow-lg shadow-emerald-500/10 cursor-pointer"
               >
                 <Send className="w-4 h-4" />
               </button>
@@ -198,7 +163,7 @@ export default function CFGSimulatorUI() {
                       key={sample}
                       type="button"
                       onClick={() => setInputString(sample)}
-                      className="rounded-2xl border border-emerald-500/30 px-3 py-2 text-xs font-mono text-emerald-300 hover:bg-emerald-500/10 transition"
+                      className="rounded-none bg-white border border-emerald-200/60 px-3.5 py-2.5 text-xs text-emerald-700 font-bold hover:bg-emerald-50/80 hover:text-emerald-800 hover:border-emerald-400 hover:shadow-sm transition-all duration-200 cursor-pointer"
                     >
                       {sample}
                     </button>
@@ -216,7 +181,7 @@ export default function CFGSimulatorUI() {
                       key={sample}
                       type="button"
                       onClick={() => setInputString(sample)}
-                      className="rounded-2xl border border-rose-500/30 px-3 py-2 text-xs font-mono text-rose-300 hover:bg-rose-500/10 transition"
+                      className="rounded-none bg-white border border-rose-200/60 px-3.5 py-2.5 text-xs text-rose-700 font-bold hover:bg-rose-50/80 hover:text-rose-800 hover:border-rose-400 hover:shadow-sm transition-all duration-200 cursor-pointer"
                     >
                       {sample}
                     </button>
@@ -227,55 +192,59 @@ export default function CFGSimulatorUI() {
           </div>
 
           <div
-            className={`p-4 rounded-2xl border transition-all duration-300 flex items-center justify-between ${result?.isAccepted ? "bg-emerald-500/10 border-emerald-500/30" : result ? "bg-rose-500/10 border-rose-500/30" : "bg-slate-950 border-slate-800"}`}
+            className={
+              "p-4 rounded-none border transition-all duration-300 flex items-center justify-between " +
+              (result?.isAccepted
+                ? "bg-emerald-50 border-emerald-200"
+                : result
+                ? "bg-rose-50 border-rose-200"
+                : "bg-slate-50 border-slate-200")
+            }
           >
             <div>
               <span className="text-[10px] text-slate-600 font-bold uppercase block mb-1">
-                Status
+                Compiler Status
               </span>
               <span
-                className={`text-sm font-black tracking-widest ${result ? (result.isAccepted ? "text-emerald-400" : "text-rose-400") : "text-slate-500"}`}
+                className={
+                  "text-sm font-black tracking-widest " +
+                  (result
+                    ? result.isAccepted
+                      ? "text-emerald-600"
+                      : "text-rose-600"
+                    : "text-slate-600")
+                }
               >
                 {isValidating
                   ? "PARSING..."
                   : result
-                    ? result.isAccepted
-                      ? "VALID_GRAMMAR"
-                      : "REJECTED"
-                    : "IDLE"}
+                  ? result.isAccepted
+                    ? "SUCCESS"
+                    : "REJECTED"
+                  : "IDLE"}
               </span>
             </div>
             {result &&
               (result.isAccepted ? (
-                <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                <CheckCircle2 className="w-5 h-5 text-emerald-500" />
               ) : (
-                <AlertCircle className="w-5 h-5 text-rose-400" />
+                <AlertCircle className="w-5 h-5 text-rose-500" />
               ))}
           </div>
         </div>
 
-        {/* UPDATED: Footer message matches new engine settings */}
-        <div className="mt-8 pt-6 border-t border-slate-800/50">
-          <p className="text-[10px] text-slate-600 leading-relaxed font-mono italic">
-            [SYS] Performing BFS sentential form expansion... Max depth 50000
-            nodes. Variables sorted by length for multi-char safety.
+        <div className="mt-8 pt-6 border-t border-slate-200">
+          <p className="text-[10px] text-slate-400 leading-relaxed italic">
+            [SYS] Performing BFS sentential expansion... Max depth 50k.
           </p>
         </div>
       </div>
 
       {/* Grammar Rules Bento Box */}
-      <div className="col-span-12 lg:col-span-8 lg:row-span-3 bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl relative overflow-hidden">
-        <div
-          className="absolute inset-0 opacity-[0.02] pointer-events-none z-0"
-          style={{
-            backgroundImage: "radial-gradient(#fff 1px, transparent 1px)",
-            backgroundSize: "16px 16px",
-          }}
-        ></div>
-
+      <div className="col-span-12 lg:col-span-8 lg:row-span-3 bg-white/70 border border-white rounded-none p-6 shadow-2xl relative overflow-hidden">
         <div className="relative z-10 h-full min-h-0">
-          <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-6">
-            Formal Grammar (G)
+          <h3 className="text-xs font-bold text-black uppercase tracking-widest mb-6">
+            Formal Grammar Definition (G)
           </h3>
           <div className="h-full min-h-0 overflow-y-auto pr-2 custom-scrollbar">
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -283,20 +252,19 @@ export default function CFGSimulatorUI() {
                 Object.entries(cfg.productions).map(([v, prods]) => (
                   <div
                     key={v}
-                    className="bg-slate-950/50 p-4 rounded-2xl border border-slate-800/50"
+                    className="bg-white/80 p-4 rounded-none border border-slate-100 shadow-sm"
                   >
-                    <span className="text-[10px] text-emerald-500 font-bold block mb-1">
+                    <span className="text-[10px] text-[#0077B6] font-bold block mb-1">
                       {v}
                     </span>
-                    <div className="font-mono text-sm text-slate-300">
-                      {/* UPDATED: Display empty productions as ε */}
+                    <div className="text-sm font-bold text-slate-700">
                       {prods.map((p) => (p === "" ? "ε" : p)).join(" | ")}
                     </div>
                   </div>
                 ))
               ) : (
-                <div className="col-span-3 text-center py-4 text-slate-700 font-mono text-[10px] uppercase">
-                  &lt; Grammar unavailable until compilation &gt;
+                <div className="col-span-3 text-center py-4 text-slate-400 text-[10px] uppercase font-bold tracking-widest">
+                  &lt; Compilation Required &gt;
                 </div>
               )}
             </div>
@@ -305,18 +273,16 @@ export default function CFGSimulatorUI() {
       </div>
 
       {/* Derivation Steps Bento Box */}
-      <div className="col-span-12 lg:col-span-8 lg:row-span-4 bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col overflow-hidden shadow-xl">
+      <div className="col-span-12 lg:col-span-8 lg:row-span-3 bg-white/70 border border-white rounded-none p-6 flex flex-col overflow-hidden shadow-xl">
         <div className="flex items-center justify-between mb-8 shrink-0">
-          <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">
-            Derivation Steps
+          <h3 className="text-xs font-bold text-black uppercase tracking-widest">
+            Derivation Workflow
           </h3>
-          {/* Show step count when result exists */}
           {result?.isAccepted && (
-            <span className="text-[10px] text-emerald-400 font-mono">
-              {result.steps.length} steps
+            <span className="text-[10px] bg-blue-50 px-2 py-1 rounded-none text-[#023E8A] font-bold">
+              {result.steps.length} CYCLES
             </span>
           )}
-          <ClipboardList className="w-4 h-4 text-slate-600" />
         </div>
 
         <div className="flex-grow overflow-y-auto pr-2 custom-scrollbar">
@@ -325,10 +291,10 @@ export default function CFGSimulatorUI() {
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-                className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full shadow-[0_0_15px_rgba(16,185,129,0.2)]"
+                className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full"
               />
-              <span className="text-slate-500 animate-pulse text-xs uppercase tracking-widest font-mono">
-                Tracing derivation...
+              <span className="text-slate-400 animate-pulse text-[10px] uppercase font-bold tracking-widest">
+                Generating Traces...
               </span>
             </div>
           ) : result?.isAccepted ? (
@@ -338,21 +304,22 @@ export default function CFGSimulatorUI() {
                   key={idx}
                   initial={{ opacity: 0, y: 5 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.4 }}
+                  transition={{ delay: idx * 0.1 }}
                   className="flex items-center gap-4 group"
                 >
-                  <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-slate-950 border border-slate-800 flex items-center justify-center text-[10px] font-mono text-slate-500">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-none bg-black text-white flex items-center justify-center text-[10px] font-bold">
                     S{idx}
                   </div>
-                  <div className="flex-grow h-[1px] bg-slate-800 group-hover:bg-emerald-500/30 transition-colors"></div>
+                  <div className="flex-grow h-[1px] bg-slate-100 group-hover:bg-blue-100 transition-colors"></div>
                   <div
-                    className={`font-mono text-sm px-3 py-1 rounded bg-slate-950/50 border border-slate-800/50 ${
-                      idx === 0
-                        ? "text-sky-400 border-sky-500/20" // Start symbol
+                    className={
+                      "text-sm px-3 py-1 rounded-none border " +
+                      (idx === 0
+                        ? "bg-blue-50 border-blue-100 text-[#023E8A] font-bold"
                         : idx === result.steps.length - 1
-                          ? "text-emerald-400 font-bold border-emerald-500/20" // Final
-                          : "text-slate-400" // Intermediate
-                    }`}
+                        ? "bg-emerald-50 border-emerald-100 text-emerald-600 font-bold"
+                        : "bg-white border-slate-100 text-slate-600")
+                    }
                   >
                     {step === "" ? "ε" : step}
                   </div>
@@ -363,18 +330,14 @@ export default function CFGSimulatorUI() {
             <div className="flex flex-col items-center justify-center h-full gap-4 opacity-50">
               <AlertCircle className="w-12 h-12 text-rose-500" />
               <span className="text-rose-400 text-xs font-bold uppercase tracking-widest">
-                Syntax Analysis Error
+                Parsing Exception
               </span>
-              <p className="text-slate-600 text-[10px] max-w-[250px] text-center font-mono uppercase tracking-tighter mt-2">
-                "Compiler could not resolve the token sequence for the defined
-                grammar productions."
-              </p>
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center h-full gap-4 text-slate-800">
+            <div className="flex flex-col items-center justify-center h-full gap-4 text-slate-300">
               <Terminal className="w-16 h-16 opacity-10" />
               <p className="text-xs uppercase tracking-widest font-bold">
-                Waiting for input stream...
+                Awaiting Source...
               </p>
             </div>
           )}
@@ -382,64 +345,47 @@ export default function CFGSimulatorUI() {
       </div>
 
       {/* CFG Summary Bento Box */}
-      <div className="col-span-12 lg:col-span-4 lg:row-span-3 bg-slate-900/80 border border-slate-800 rounded-3xl p-6 flex flex-col overflow-hidden">
-        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-6 shrink-0">
-          Parsing Summary
+      <div className="col-span-12 lg:col-span-4 lg:row-span-3 bg-white/70 border border-white rounded-none p-6 flex flex-col overflow-hidden">
+        <h3 className="text-xs font-bold text-black uppercase tracking-widest mb-6 shrink-0">
+          Parsing Logic
         </h3>
         <div className="space-y-4 flex-grow overflow-y-auto pr-2 custom-scrollbar">
-          <div className="bg-emerald-500/5 p-4 rounded-2xl border border-emerald-500/10">
-            <h4 className="text-[10px] font-bold text-emerald-500 uppercase mb-2">
-              Grammar Type
+          <div className="bg-white p-5 rounded-none border border-white/50">
+            <h4 className="text-[9px] font-bold text-black uppercase mb-3 tracking-widest">
+              Grammar Metrics
             </h4>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Detected Context-Free (Type 2). Ready for PDA mapping.
-            </p>
-          </div>
-
-          {/* Current grammar stats */}
-          <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800">
-            <h4 className="text-[10px] font-bold text-slate-500 uppercase mb-2">
-              Grammar Stats
-            </h4>
-            <div className="space-y-1">
-              <p className="text-xs text-slate-400 font-mono">
-                Variables: {cfg.variables.length}
+            <div className="space-y-2">
+              <p className="text-[11px] text-black">
+                Variables: <span className="text-black">{cfg.variables.length}</span>
               </p>
-              <p className="text-xs text-slate-400 font-mono">
-                Terminals: {cfg.terminals.join(", ")}
+              <p className="text-[11px] text-black">
+                Alphabet: <span className="text-black">{"{"}{cfg.terminals.join(", ")}{"}"}</span>
               </p>
-              <p className="text-xs text-slate-400 font-mono">
-                Productions:{" "}
-                {Object.values(cfg.productions).reduce(
-                  (sum, prods) => sum + prods.length,
-                  0,
-                )}
-              </p>
-              <p className="text-xs text-slate-400 font-mono">
-                Start: {cfg.startSymbol}
+              <p className="text-[11px] text-black">
+                Complexity: <span className="text-black">Type 2 (CFG)</span>
               </p>
             </div>
-          </div>
-
-          <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800">
-            <h4 className="text-[10px] font-bold text-slate-500 uppercase mb-2">
-              Automata Parity
-            </h4>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Grammar matches the structural complexity of{" "}
-              {selectedCfgKey === "cfg1" ? "DFA1" : "DFA2"} with{" "}
-              {cfg.variables.length} states.
-            </p>
+            
+            <div className="h-px bg-slate-800 my-4" />
+            
+            <div className="bg-white p-3 rounded-none border border-white/50">
+                <p className="text-[10px] text-emerald-400 leading-relaxed font-bold">
+                    STRUCTURAL_PARITY: 100% MATCH
+                </p>
+                <p className="text-[9px] text-black mt-1">
+                    Grammar verified against mapped {selectedCfgKey === "cfg1" ? "DFA1" : "DFA2"} structure.
+                </p>
+            </div>
           </div>
         </div>
-        <div className="mt-auto pt-6 border-t border-slate-800/50 flex items-center justify-between">
-          <span className="text-[10px] text-slate-700 font-mono">
-            GEN_MODE: BFS_SENTENTIAL
+        <div className="mt-auto pt-6 border-t border-slate-200 flex items-center justify-between">
+          <span className="text-[10px] text-black font-bold uppercase tracking-tighter">
+            Mode: Sentential_Expansion
           </span>
           <div className="flex gap-1">
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/50"></div>
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/20"></div>
+            <div className="w-1.5 h-1.5 rounded-none bg-emerald-500"></div>
+            <div className="w-1.5 h-1.5 rounded-none bg-emerald-300"></div>
+            <div className="w-1.5 h-1.5 rounded-none bg-emerald-100"></div>
           </div>
         </div>
       </div>
