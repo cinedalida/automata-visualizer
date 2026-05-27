@@ -13,6 +13,27 @@ import { CFGEngine, DerivationResult } from "./cfgEngine";
 import { motion } from "motion/react";
 import { REGEX_1, REGEX_2 } from "../constants";
 
+const renderHighlightedSentential = (sentential: string, highlightVar?: string) => {
+  if (!highlightVar) return <span className="font-semibold text-slate-800">{sentential === "" ? "λ" : sentential}</span>;
+
+  const idx = sentential.indexOf(highlightVar);
+  if (idx === -1) return <span className="font-semibold text-slate-800">{sentential === "" ? "λ" : sentential}</span>;
+
+  const before = sentential.slice(0, idx);
+  const matched = sentential.slice(idx, idx + highlightVar.length);
+  const after = sentential.slice(idx + highlightVar.length);
+
+  return (
+    <span className="font-semibold text-slate-800 tracking-wide font-mono">
+      {before}
+      <span className="bg-amber-100 text-amber-900 border border-amber-300 px-1.5 py-0.5 rounded-sm font-black mx-0.5 shadow-sm inline-block">
+        {matched}
+      </span>
+      {after}
+    </span>
+  );
+};
+
 export default function CFGSimulatorUI() {
   const [regexInput, setRegexInput] = useState(REGEX_1);
   const [selectedCfgKey, setSelectedCfgKey] =
@@ -479,39 +500,64 @@ export default function CFGSimulatorUI() {
       </div>
 
       {/* Grammar Rules Bento Box */}
-      <div className="col-span-12 lg:col-span-8 lg:row-span-3 bg-white/70 border border-white rounded-none p-6 shadow-2xl relative overflow-hidden">
-        <div className="relative z-10 h-full min-h-0">
-          <h3 className="text-xs font-bold text-black uppercase tracking-widest mb-6">
-            GRAMMAR
-          </h3>
-          <div className="h-full min-h-0 overflow-y-auto pr-2 custom-scrollbar">
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-              {isValidRegex ? (
-                Object.entries(cfg.productions).map(([v, prods]) => (
-                  <div
-                    key={v}
-                    className="bg-white/80 p-4 rounded-none border border-slate-100 shadow-sm"
-                  >
-                    <span className="text-[10px] text-[#0077B6] font-bold block mb-1">
-                      {v}
-                    </span>
-                    <div className="text-sm font-bold text-slate-700">
-                      {prods.map((p) => (p === "" ? "ε" : p)).join(" | ")}
-                    </div>
+      <div className="col-span-12 lg:col-span-8 lg:row-span-3 bg-white/70 border border-white rounded-none p-6 shadow-2xl relative overflow-hidden flex flex-col">
+        <div className="relative z-10 flex flex-col h-full min-h-0">
+          {isValidRegex ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch h-full min-h-0 flex-grow">
+              {/* Column 1: Grammar Definition */}
+              <div className="flex flex-col h-full min-h-0">
+                <h4 className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3 shrink-0">
+                  Grammar Definition
+                </h4>
+                <div className="flex-grow flex flex-col justify-center bg-[#0077B6]/5 border border-[#0077B6]/10 p-5 rounded-none overflow-y-auto custom-scrollbar">
+                  <div className="text-base font-black text-black tracking-wide font-mono mb-2">
+                    G = (V, T, P, S)
                   </div>
-                ))
-              ) : (
-                <div className="col-span-3 text-center py-4 text-slate-400 text-[10px] uppercase font-bold tracking-widest">
-                  &lt; Compilation Required &gt;
+                  <div className="text-[11px] text-slate-700 font-bold uppercase tracking-wider mb-2">
+                    Where:
+                  </div>
+                  <div className="text-xs text-slate-700 font-bold space-y-1.5 pl-4 border-l border-[#0077B6]/40">
+                    <div>V = {"{"}{cfg.variables.join(", ")}{"}"}</div>
+                    <div>T = {"{"}{cfg.terminals.join(", ")}{"}"}</div>
+                    <div>S is the start symbol</div>
+                    <div>P is the set of production rules</div>
+                  </div>
                 </div>
-              )}
+              </div>
+
+              {/* Column 2: Production Rules */}
+              <div className="flex flex-col h-full min-h-0">
+                <h4 className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3 shrink-0">
+                  Production Rules
+                </h4>
+                <div className="flex-grow overflow-y-auto pr-2 custom-scrollbar bg-white border border-slate-100/80 rounded-none shadow-sm divide-y divide-slate-100 font-mono text-xs">
+                  {Object.entries(cfg.productions).map(([v, prods]) => (
+                    <div key={v} className="flex items-center gap-4 px-4 py-2.5 hover:bg-slate-50/50 transition-colors">
+                      <span className="text-[#0077B6] font-extrabold text-sm w-4 shrink-0 text-center">{v}</span>
+                      <span className="text-slate-400 font-medium">→</span>
+                      <span className="font-bold text-slate-855 tracking-wide text-xs">
+                        {prods.map((p) => (p === "" ? "λ" : p)).join(" | ")}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="flex flex-col h-full min-h-0">
+              <h3 className="text-xs font-bold text-black uppercase tracking-widest mb-4 shrink-0">
+                Grammar Definition
+              </h3>
+              <div className="flex-grow flex items-center justify-center text-slate-400 text-[10px] uppercase font-bold tracking-widest">
+                &lt; Compilation Required &gt;
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Derivation Steps Bento Box */}
-      <div className="col-span-12 lg:col-span-8 lg:row-span-3 bg-white/70 border border-white rounded-none p-6 flex flex-col overflow-hidden shadow-xl">
+      <div className="col-span-12 lg:col-span-12 lg:row-span-3 bg-white/70 border border-white rounded-none p-6 flex flex-col overflow-hidden shadow-xl">
         <div className="flex items-center justify-between mb-8 shrink-0">
           <h3 className="text-xs font-bold text-black uppercase tracking-widest">
             Derivation Workflow
@@ -540,94 +586,91 @@ export default function CFGSimulatorUI() {
                 Generating Traces...
               </span>
             </div>
-          ) : result?.isAccepted ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-              {result.steps.map((step, idx) => (
-                <motion.div
-                  key={idx}
-                  initial={{ opacity: 0, y: 5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.1 }}
-                  className="flex items-center gap-4 group"
-                >
-                  <div className="flex-shrink-0 w-8 h-8 rounded-none bg-black text-white flex items-center justify-center text-[10px] font-bold">
-                    S{idx}
-                  </div>
-                  <div className="flex-grow h-[1px] bg-slate-100 group-hover:bg-blue-100 transition-colors"></div>
-                  <div
-                    className={
-                      "text-sm px-3 py-1 rounded-none border " +
-                      (idx === 0
-                        ? "bg-blue-50 border-blue-100 text-[#023E8A] font-bold"
-                        : idx === result.steps.length - 1
-                        ? "bg-emerald-50 border-emerald-100 text-emerald-600 font-bold"
-                        : "bg-white border-slate-100 text-slate-600")
-                    }
-                  >
-                    {step === "" ? "ε" : step}
-                  </div>
-                </motion.div>
-              ))}
-            </div>
           ) : result ? (
             <div className="flex flex-col gap-6">
-              {result.steps.length > 0 && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-                  {result.steps.map((step, idx) => (
+              <div className="flex flex-col gap-3">
+                {result.derivationSteps && result.derivationSteps.map((stepItem, idx) => {
+                  const nextStep = result.derivationSteps ? result.derivationSteps[idx + 1] : undefined;
+                  const isLast = idx === (result.derivationSteps?.length || 0) - 1;
+
+                  return (
                     <motion.div
                       key={idx}
-                      initial={{ opacity: 0, y: 5 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: idx * 0.05 }}
-                      className="flex items-center gap-4 group"
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: idx * 0.04 }}
+                      className="flex flex-col md:flex-row md:items-center justify-between p-3.5 bg-white border border-slate-100 shadow-sm gap-4 group hover:border-[#0077B6]/30 transition-all rounded-none"
                     >
-                      <div className="flex-shrink-0 w-8 h-8 rounded-none bg-slate-800 text-white flex items-center justify-center text-[10px] font-bold">
-                        S{idx}
+                      {/* Left: Step number and Form */}
+                      <div className="flex items-center gap-4 min-w-[200px]">
+                        <div className={`w-8 h-8 rounded-none flex items-center justify-center text-[10px] font-black text-white shrink-0 ${
+                          idx === 0 
+                            ? "bg-blue-600" 
+                            : isLast 
+                            ? (result.isAccepted ? "bg-emerald-600" : "bg-rose-600") 
+                            : "bg-slate-800"
+                        }`}>
+                          S{idx}
+                        </div>
+                        <div className="text-sm font-mono tracking-wider">
+                          {renderHighlightedSentential(stepItem.sentential, nextStep?.variableReplaced)}
+                        </div>
                       </div>
-                      <div className="flex-grow h-[1px] bg-slate-100 group-hover:bg-rose-100 transition-colors"></div>
-                      <div
-                        className={
-                          "text-sm px-3 py-1 rounded-none border " +
-                          (idx === 0
-                            ? "bg-blue-50 border-blue-100 text-[#023E8A] font-bold"
-                            : idx === result.steps.length - 1
-                            ? "bg-rose-50 border-rose-200 text-rose-600 font-bold"
-                            : "bg-white border-slate-100 text-slate-600")
-                        }
-                      >
-                        {step === "" ? "ε" : step}
-                      </div>
+
+                      {/* Right: Applied Substitution Rule */}
+                      {!isLast && nextStep && (
+                        <div className="flex items-center gap-3 bg-slate-50 border border-slate-100 px-4 py-2 text-xs font-mono text-slate-600 rounded-none shrink-0 self-start md:self-auto">
+                          <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Substituted:</span>
+                          <div className="flex items-center gap-2">
+                            <span className="font-black text-[#0077B6] bg-blue-50 border border-blue-100 px-1 py-0.5">{nextStep.variableReplaced}</span>
+                            <span className="text-slate-400">with</span>
+                            <span className="font-bold text-slate-800 bg-slate-100 border border-slate-200 px-1 py-0.5">{nextStep.replacedWith || "λ"}</span>
+                          </div>
+                        </div>
+                      )}
+
+                      {isLast && (
+                        <div className={`flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-none shrink-0 self-start md:self-auto ${
+                          result.isAccepted 
+                            ? "bg-emerald-50 text-emerald-700 border border-emerald-100" 
+                            : "bg-rose-50 text-rose-700 border border-rose-100"
+                        }`}>
+                          {result.isAccepted ? "✓ Terminal String" : "✗ Incomplete Derivation"}
+                        </div>
+                      )}
                     </motion.div>
-                  ))}
+                  );
+                })}
+              </div>
+
+              {!result.isAccepted && (
+                /* Premium Compiler Diagnostics Console */
+                <div className="p-5 bg-rose-50 border border-rose-200 text-slate-800 rounded-none shrink-0">
+                  <div className="flex items-center gap-3 text-rose-600 mb-4">
+                    <AlertCircle className="w-5 h-5 shrink-0" />
+                    <span className="text-[10px] font-black uppercase tracking-widest leading-none">
+                      COMPILER ERROR: PARSING_EXCEPTION
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-bold text-slate-700">
+                    <div className="p-3 bg-white border border-slate-100">
+                      <span className="text-slate-400 text-[9px] uppercase block tracking-widest font-normal mb-1">Parsed Portion:</span>
+                      <span className="text-emerald-600 font-mono text-xs break-all">
+                        {inputString.slice(0, result.matchedLength) || "λ (None)"}
+                      </span>
+                    </div>
+                    <div className="p-3 bg-white border border-slate-100">
+                      <span className="text-slate-400 text-[9px] uppercase block tracking-widest font-normal mb-1">Unexpected Suffix/Token:</span>
+                      <span className="text-rose-600 font-mono text-xs break-all">
+                        {inputString.slice(result.matchedLength) ? `"${inputString.slice(result.matchedLength)}"` : "EOF (End of File)"}
+                      </span>
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-slate-500 font-medium leading-relaxed mt-4 pt-3 border-t border-rose-100">
+                    The compiler successfully parsed the green prefix but encountered a syntax mismatch with the remaining red suffix. No valid productions from the active variables in state <span className="font-bold text-slate-800">"{result.steps[result.steps.length - 1] || cfg.startSymbol}"</span> can derive the rest of the target string.
+                  </p>
                 </div>
               )}
-
-              {/* Premium Compiler Diagnostics Console */}
-              <div className="p-5 bg-rose-50 border border-rose-200 text-slate-800 rounded-none shrink-0">
-                <div className="flex items-center gap-3 text-rose-600 mb-4">
-                  <AlertCircle className="w-5 h-5 shrink-0" />
-                  <span className="text-[10px] font-black uppercase tracking-widest leading-none">
-                    COMPILER ERROR: PARSING_EXCEPTION
-                  </span>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-bold text-slate-700">
-                  <div className="p-3 bg-white border border-slate-100">
-                    <span className="text-slate-400 text-[9px] uppercase block tracking-widest font-normal mb-1">Parsed Portion:</span>
-                    <span className="text-emerald-600 font-mono text-xs break-all">
-                      {inputString.slice(0, result.matchedLength) || "ε (None)"}
-                    </span>
-                  </div>
-                  <div className="p-3 bg-white border border-slate-100">
-                    <span className="text-slate-400 text-[9px] uppercase block tracking-widest font-normal mb-1">Unexpected Suffix/Token:</span>
-                    <span className="text-rose-600 font-mono text-xs break-all">
-                      {inputString.slice(result.matchedLength) ? `"${inputString.slice(result.matchedLength)}"` : "EOF (End of File)"}
-                    </span>
-                  </div>
-                </div>
-                <p className="text-[10px] text-slate-500 font-medium leading-relaxed mt-4 pt-3 border-t border-rose-100">
-                  The compiler successfully parsed the green prefix but encountered a syntax mismatch with the remaining red suffix. No valid productions from the active variables in state <span className="font-bold text-slate-800">"{result.steps[result.steps.length - 1] || cfg.startSymbol}"</span> can derive the rest of the target string.
-                </p>
-              </div>
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center h-full gap-4 text-slate-300">
@@ -637,41 +680,6 @@ export default function CFGSimulatorUI() {
               </p>
             </div>
           )}
-        </div>
-      </div>
-
-      {/* CFG Summary Bento Box */}
-      <div className="col-span-12 lg:col-span-4 lg:row-span-3 bg-white/70 border border-white rounded-none p-6 flex flex-col overflow-hidden">
-        <h3 className="text-xs font-bold text-black uppercase tracking-widest mb-6 shrink-0">
-          Parsing Logic
-        </h3>
-        <div className="space-y-4 flex-grow overflow-y-auto pr-2 custom-scrollbar">
-          <div className="bg-white p-5 rounded-none border border-white/50">
-            <h4 className="text-[9px] font-bold text-black uppercase mb-3 tracking-widest">
-              Grammar Metrics
-            </h4>
-            <div className="space-y-2">
-              <p className="text-[11px] text-black">
-                Variables: <span className="text-black">{cfg.variables.length}</span>
-              </p>
-              <p className="text-[11px] text-black">
-                Alphabet: <span className="text-black">{"{"}{cfg.terminals.join(", ")}{"}"}</span>
-              </p>
-              <p className="text-[11px] text-black">
-                Complexity: <span className="text-black">Type 2 (CFG)</span>
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="mt-auto pt-6 border-t border-slate-200 flex items-center justify-between">
-          <span className="text-[10px] text-black font-bold uppercase tracking-tighter">
-            Mode: Sentential_Expansion
-          </span>
-          <div className="flex gap-1">
-            <div className="w-1.5 h-1.5 rounded-none bg-emerald-500"></div>
-            <div className="w-1.5 h-1.5 rounded-none bg-emerald-300"></div>
-            <div className="w-1.5 h-1.5 rounded-none bg-emerald-100"></div>
-          </div>
         </div>
       </div>
     </div>

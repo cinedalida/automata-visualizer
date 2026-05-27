@@ -1,9 +1,16 @@
 import { CFG } from "../types";
 
+export interface DerivationStepInfo {
+  sentential: string;
+  variableReplaced?: string;
+  replacedWith?: string;
+}
+
 export interface DerivationResult {
   steps: string[];
   isAccepted: boolean;
   matchedLength?: number;
+  derivationSteps?: DerivationStepInfo[];
 }
 
 export class CFGEngine {
@@ -54,9 +61,9 @@ export class CFGEngine {
     const before = sentential.slice(0, varIndex);
     const after = sentential.slice(varIndex + variable.length);
 
-    // Handle epsilon: both '' and 'ε' are treated as empty
+    // Handle epsilon: both '', 'ε', and 'λ' are treated as empty
     const replacement =
-      production === "ε" || production === "" ? "" : production;
+      production === "ε" || production === "λ" || production === "" ? "" : production;
 
     return before + replacement + after;
   }
@@ -102,10 +109,15 @@ export class CFGEngine {
   // Main validation: BFS leftmost derivation
   // ============================================================
   validate(input: string): DerivationResult {
-    const queue: { sentential: string; derivation: string[] }[] = [
+    const queue: {
+      sentential: string;
+      derivation: string[];
+      derivationSteps: DerivationStepInfo[];
+    }[] = [
       {
         sentential: this.cfg.startSymbol,
         derivation: [this.cfg.startSymbol],
+        derivationSteps: [{ sentential: this.cfg.startSymbol }],
       },
     ];
 
@@ -116,6 +128,7 @@ export class CFGEngine {
     let stepsCount = 0;
 
     let bestDerivation: string[] = [this.cfg.startSymbol];
+    let bestDerivationSteps: DerivationStepInfo[] = [{ sentential: this.cfg.startSymbol }];
     let maxMatchedLength = 0;
 
     while (queue.length > 0 && stepsCount < maxSteps) {
@@ -130,6 +143,7 @@ export class CFGEngine {
           steps: current.derivation,
           isAccepted: true,
           matchedLength: input.length,
+          derivationSteps: current.derivationSteps,
         };
       }
 
@@ -156,6 +170,7 @@ export class CFGEngine {
       if (matchedLength > maxMatchedLength) {
         maxMatchedLength = matchedLength;
         bestDerivation = current.derivation;
+        bestDerivationSteps = current.derivationSteps;
       }
 
       // No variables left but didn't match input → dead end
@@ -217,19 +232,34 @@ export class CFGEngine {
           // --------------------------------------------------------
           if (this.isAllTerminals(nextSentential)) {
             if (nextSentential === input) {
+              const finalSteps = [
+                ...current.derivationSteps,
+                {
+                  sentential: nextSentential,
+                  variableReplaced: varName,
+                  replacedWith: prod === "" ? "λ" : prod,
+                },
+              ];
               return {
                 steps: [...current.derivation, nextSentential],
                 isAccepted: true,
                 matchedLength: input.length,
+                derivationSteps: finalSteps,
               };
             }
             // All terminals but wrong string → dead end
             continue;
           }
 
+          const nextStepInfo: DerivationStepInfo = {
+            sentential: nextSentential,
+            variableReplaced: varName,
+            replacedWith: prod === "" ? "λ" : prod,
+          };
           queue.push({
             sentential: nextSentential,
             derivation: [...current.derivation, nextSentential],
+            derivationSteps: [...current.derivationSteps, nextStepInfo],
           });
         }
       }
@@ -244,6 +274,7 @@ export class CFGEngine {
       steps: bestDerivation,
       isAccepted: false,
       matchedLength: maxMatchedLength,
+      derivationSteps: bestDerivationSteps,
     };
   }
 }
