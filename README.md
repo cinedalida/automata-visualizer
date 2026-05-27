@@ -8,12 +8,16 @@ The **Automata Compiler Visualizer** is a powerful, interactive, and premium web
 
 The visualizer implements a wide array of premium interactive and diagnostic features that transform theoretical automata exercises into engaging experiments:
 
-* **Interactive Multi-Model Simulation**: Full support for designing, tracing, and resolving strings against three major computational models: Deterministic Finite Automata (DFA), Pushdown Automata (PDA), and Context-Free Grammars (CFG).
-* **Dynamic Vector Graph Visualization**: Built on **D3.js**, the vector graph engine draws custom force-directed nodes, transition lines, self-loops, and curvature paths. Process states and transitions are highlighted dynamically with color-accented trails.
-* **Animated Stack Memory Display**: An interactive pushdown stack panel updates on every simulation step. Users can watch stack symbols shift, grow, and shrink with responsive micro-animations for push and pop actions.
-* **Compiler-Grade Diagnostics**: The CFG compiler features a dedicated parsing console that highlights the input string based on compliance. Correct segments are highlighted in green, while the exact starting index of syntax errors is highlighted in red, accompanied by precise failure diagnostics.
-* **Interactive Playback Controls**: Control the pace of computation with full-featured transport keys: Play/Pause (with optimized multi-speed interval pacing), Step Forward, Reset, and Jump to specific cycles.
-* **Valid/Invalid Sample Testbeds**: Comes pre-populated with complex edge cases and standard validation string suites (problems on closure properties and concatenation rules), facilitating instant verification of correct and incorrect scenarios.
+* **Compiler Selector**: Users can navigate between the DFA Visualizer, PDA Simulator, and CFG Compiler using the top navigation bar to validate strings against different formal models. While these compilers were built from scratch closely following formal definitions, some visual compromises were made to simplify the user experience.
+* **Operational Trace / Transition Table**: Provides real-time, step-by-step information detailing the operations of the selected automaton. For instance, in the DFA Visualizer, the Transition Table shows each character being read and its corresponding processing status. If the compiler fails, a meaningful error message is returned detailing the cause of failure.
+* **Compiler Result**: Displays a straightforward message derived from the processing trace, confirming whether the input string is "ACCEPTED," "REJECTED," or currently "IDLE/PROCESSING" by the automaton.
+* **State Visualization** - Displays a dynamic, node-based graph of the automaton, highlighting the active state and the sequence of transitions as each character in the input string is processed. The visualization also includes interactive controls for zooming in, zooming out, and enabling full-screen mode to provide a clearer and more detailed view of the structure. 
+* **Animated Stack Memory (PDA Simulator Only)**: Visually represents the Last-In-First-Out (LIFO) stack memory used by the Pushdown Automaton. It displays how each character is pushed to or popped from the stack as the input is read, identifying the state responsible for the action and emphasizing the current top of the stack.
+* **Derivation Workflow & Grammar (CFG Compiler Only)**: Displays the defined production rules alongside a sequential derivation workflow, illustrating how the source string is expanded from the start variable to terminal symbols.
+* **Playback Controls (DFA and PDA)** - Control the pace of computation with full-featured transport keys: Play, Step Forward,  and Reset.
+* **Valid and Invalid Testbeds** - Comes pre-populated with complex edge cases and standard validation string suites, facilitating instant verification of correct and incorrect scenarios.
+* **Multiline/Batch Processing of Strings** - Supports both single-string and multiline batch processing modes through a toggleable interface. Users can validate up to five input strings simultaneously, with each string processed independently and its corresponding result displayed.
+* **User Manual** - Provides an overview of automata theory, the core functionalities of the compiler suite, and a step-by-step tutorial on how to use each module. It also includes explanations of supported formal models, interface controls, input formatting rules, and sample test cases to guide users throughout the simulation process.
 
 ---
 
