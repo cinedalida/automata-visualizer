@@ -34,8 +34,8 @@ export default function UserManualUI() {
             </p>
           </div>
         </div>
-        <div className="text-[11px] bg-slate-50 border border-slate-200 px-4 py-2 font-mono text-slate-600 rounded-none font-bold uppercase tracking-wider shadow-sm">
-          GeeksforGeeks Reference Standard v1.2
+        <div className="text-[11px] bg-slate-50 border border-slate-200 px-4 py-2 font-mono text-slate-600 rounded-none font-bold tracking-wider shadow-sm">
+          Reference: <a href="https://www.geeksforgeeks.org/" target="_blank" rel="noopener noreferrer" className="underline text-[#0077B6] hover:text-[#005f9e] transition-colors">GeeksforGeeks</a>
         </div>
       </div>
 
