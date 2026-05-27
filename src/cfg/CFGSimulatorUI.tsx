@@ -5,6 +5,8 @@ import {
   CheckCircle2,
   AlertCircle,
   ChevronRight,
+  Plus,
+  X,
 } from "lucide-react";
 import { CFG_EXAMPLES } from "./cfgData";
 import { CFGEngine, DerivationResult } from "./cfgEngine";
@@ -16,7 +18,14 @@ export default function CFGSimulatorUI() {
   const [selectedCfgKey, setSelectedCfgKey] =
     useState<keyof typeof CFG_EXAMPLES>("cfg1");
   const [isValidRegex, setIsValidRegex] = useState(true);
-  const [inputString, setInputString] = useState("111111");
+
+  const [isBatchMode, setIsBatchMode] = useState(false);
+  const [inputStrings, setInputStrings] = useState<string[]>(["111111", "0011010", "1111010"]);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [results, setResults] = useState<Record<number, DerivationResult | null>>({});
+  const [isValidatingAll, setIsValidatingAll] = useState(false);
+
+  const inputString = inputStrings[activeIndex] || "";
   const [result, setResult] = useState<DerivationResult | null>(null);
   const [isValidating, setIsValidating] = useState(false);
 
@@ -53,10 +62,13 @@ export default function CFGSimulatorUI() {
 
   useEffect(() => {
     setResult(null);
+    setResults({});
     if (selectedCfgKey === "cfg1") {
-      setInputString("111111");
+      setInputStrings(["111111", "0011010", "1111010"]);
+      setActiveIndex(0);
     } else {
-      setInputString("ababaaa");
+      setInputStrings(["ababaaa", "babababbb", "babaabbaa"]);
+      setActiveIndex(0);
     }
   }, [selectedCfgKey]);
 
@@ -66,7 +78,95 @@ export default function CFGSimulatorUI() {
       .split("")
       .filter((ch) => allowed.includes(ch))
       .join("");
-    setInputString(filtered);
+    const newStrings = [...inputStrings];
+    newStrings[activeIndex] = filtered;
+    setInputStrings(newStrings);
+    // Reset result for this index
+    setResults((prev) => {
+      const next = { ...prev };
+      delete next[activeIndex];
+      return next;
+    });
+  };
+
+  const handleBatchInputChange = (index: number, val: string) => {
+    const allowed = cfg.terminals;
+    const filtered = val.split("").filter((ch) => allowed.includes(ch)).join("");
+    const newStrings = [...inputStrings];
+    newStrings[index] = filtered;
+    setInputStrings(newStrings);
+    // Reset result for this index
+    setResults((prev) => {
+      const next = { ...prev };
+      delete next[index];
+      return next;
+    });
+  };
+
+  const handleAddInputRow = () => {
+    if (inputStrings.length >= 5) return;
+    setInputStrings([...inputStrings, ""]);
+  };
+
+  const handleDeleteInputRow = (index: number) => {
+    if (inputStrings.length <= 1) return;
+    const newStrings = inputStrings.filter((_, idx) => idx !== index);
+    setInputStrings(newStrings);
+    
+    // adjust active index if needed
+    if (activeIndex >= newStrings.length) {
+      setActiveIndex(newStrings.length - 1);
+    }
+    
+    // adjust results
+    const newResults: Record<number, DerivationResult | null> = {};
+    let newIdx = 0;
+    inputStrings.forEach((_, idx) => {
+      if (idx !== index) {
+        if (results[idx] !== undefined) {
+          newResults[newIdx] = results[idx];
+        }
+        newIdx++;
+      }
+    });
+    setResults(newResults);
+  };
+
+  const handleSelectString = (index: number) => {
+    setActiveIndex(index);
+    setResult(results[index] || null);
+  };
+
+  const validateAll = () => {
+    if (!isValidRegex) return;
+    setIsValidatingAll(true);
+    setTimeout(() => {
+      const engine = new CFGEngine(cfg);
+      const newResults: Record<number, DerivationResult | null> = {};
+      inputStrings.forEach((str, idx) => {
+        newResults[idx] = engine.validate(str);
+      });
+      setResults(newResults);
+      setResult(newResults[activeIndex] || null);
+      setIsValidatingAll(false);
+    }, 1500); // Satisfying progressive compiler evaluation feel
+  };
+
+  const handleSetSingleString = (str: string) => {
+    if (isBatchMode) {
+      const newStrings = [...inputStrings];
+      newStrings[activeIndex] = str;
+      setInputStrings(newStrings);
+      setResults((prev) => {
+        const next = { ...prev };
+        delete next[activeIndex];
+        return next;
+      });
+    } else {
+      setInputStrings([str]);
+      setActiveIndex(0);
+      setResults({});
+    }
   };
 
   const validate = () => {
@@ -129,28 +229,166 @@ export default function CFGSimulatorUI() {
               }
             </div>
 
-            <label className="block text-[10px] font-bold text-slate-600 uppercase mb-3 tracking-widest">
-              Source String
-              <span className="ml-2 text-slate-700 normal-case">
-                (allowed: {cfg.terminals.join(", ")})
-              </span>
-            </label>
-            <div className="relative">
-              <input
-                type="text"
-                value={inputString}
-                onChange={(e) => handleInputChange(e.target.value)}
-                placeholder={`Enter ${cfg.terminals.join("/")} string...`}
-                className="w-full bg-white border border-slate-200/80 rounded-none px-5 py-4 focus:outline-none focus:ring-2 focus:ring-[#0077B6]/20 text-xs text-slate-800 appearance-none hover:border-slate-300 transition-all font-medium"
-              />
-              <button
-                onClick={validate}
-                disabled={isValidating || !inputString}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-emerald-500 text-white hover:bg-emerald-400 rounded-none disabled:opacity-30 transition-all shadow-lg shadow-emerald-500/10 cursor-pointer"
-              >
-                <Send className="w-4 h-4" />
-              </button>
+            <div className="flex items-center justify-between mb-3">
+              <label className="block text-[10px] font-bold text-slate-600 uppercase tracking-widest">
+                Input Mode
+              </label>
+              <div className="flex bg-slate-100 p-0.5 rounded-none border border-slate-200">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsBatchMode(false);
+                    setInputStrings([inputStrings[activeIndex] || ""]);
+                    setActiveIndex(0);
+                    setResults({});
+                    setResult(null);
+                  }}
+                  className={`px-3 py-1 text-[9px] font-bold uppercase tracking-wider rounded-none transition-all cursor-pointer ${
+                    !isBatchMode
+                      ? "bg-white text-[#0077B6] shadow-sm border border-slate-200"
+                      : "text-slate-500 hover:text-slate-800"
+                  }`}
+                >
+                  Single
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsBatchMode(true)}
+                  className={`px-3 py-1 text-[9px] font-bold uppercase tracking-wider rounded-none transition-all cursor-pointer ${
+                    isBatchMode
+                      ? "bg-white text-[#0077B6] shadow-sm border border-slate-200"
+                      : "text-slate-500 hover:text-slate-800"
+                  }`}
+                >
+                  Batch (Up to 5)
+                </button>
+              </div>
             </div>
+
+            {!isBatchMode ? (
+              <>
+                <label className="block text-[10px] font-bold text-slate-600 uppercase mb-3 tracking-widest">
+                  Source String
+                  <span className="ml-2 text-slate-700 normal-case">
+                    (allowed: {cfg.terminals.join(", ")})
+                  </span>
+                </label>
+                <div className="relative mb-6">
+                  <input
+                    type="text"
+                    value={inputString}
+                    onChange={(e) => handleInputChange(e.target.value)}
+                    placeholder={`Enter ${cfg.terminals.join("/")} string...`}
+                    className="w-full bg-white border border-slate-200/80 rounded-none px-5 py-4 focus:outline-none focus:ring-2 focus:ring-[#0077B6]/20 text-xs text-slate-800 appearance-none hover:border-slate-300 transition-all font-medium pr-14"
+                  />
+                  <button
+                    onClick={validate}
+                    disabled={isValidating || !inputString}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-emerald-500 text-white hover:bg-emerald-400 rounded-none disabled:opacity-30 transition-all shadow-lg shadow-emerald-500/10 cursor-pointer"
+                  >
+                    <Send className="w-4 h-4" />
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="space-y-3 mb-6">
+                <label className="block text-[10px] font-bold text-slate-600 uppercase tracking-widest">
+                  Batch Strings
+                  <span className="ml-2 text-slate-700 normal-case">
+                    (allowed: {cfg.terminals.join(", ")})
+                  </span>
+                </label>
+                <div className="space-y-2 max-h-[220px] overflow-y-auto pr-1">
+                  {inputStrings.map((str, idx) => {
+                    const isActive = idx === activeIndex;
+                    const resItem = results[idx];
+                    return (
+                      <div
+                        key={idx}
+                        onClick={() => handleSelectString(idx)}
+                        className={`group flex items-center gap-2 p-2 border transition-all cursor-pointer rounded-none relative ${
+                          isActive
+                            ? "border-[#0077B6] bg-blue-50/30 shadow-sm"
+                            : "border-slate-200/80 bg-white hover:border-slate-300"
+                        }`}
+                      >
+                        {/* Active selection dot */}
+                        <div className={`w-1.5 h-1.5 rounded-none flex-shrink-0 ${
+                          isActive ? "bg-[#0077B6]" : "bg-transparent border border-slate-300"
+                        }`} />
+                        
+                        <input
+                          type="text"
+                          value={str}
+                          onChange={(e) => handleBatchInputChange(idx, e.target.value)}
+                          placeholder={`String ${idx + 1}...`}
+                          className="flex-grow bg-transparent text-xs font-bold text-slate-800 focus:outline-none px-1 py-1 min-w-0"
+                          onClick={(e) => e.stopPropagation()} // Prevent selecting row when clicking to edit
+                        />
+                        
+                        {/* Status Badge */}
+                        {resItem ? (
+                          resItem.isAccepted ? (
+                            <span className="text-[9px] px-2 py-0.5 font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 border border-emerald-200 rounded-none flex-shrink-0">
+                              ✓ Valid
+                            </span>
+                          ) : (
+                            <span className="text-[9px] px-2 py-0.5 font-bold uppercase tracking-wider text-rose-600 bg-rose-50 border border-rose-200 rounded-none flex-shrink-0">
+                              ✗ Invalid
+                            </span>
+                          )
+                        ) : (
+                          <span className="text-[9px] px-2 py-0.5 font-bold uppercase tracking-wider text-slate-400 bg-slate-50 border border-slate-200 rounded-none flex-shrink-0">
+                            Pending
+                          </span>
+                        )}
+
+                        {/* Delete Row Button */}
+                        {inputStrings.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteInputRow(idx);
+                            }}
+                            className="opacity-0 group-hover:opacity-100 p-1 hover:text-rose-600 text-slate-400 transition-opacity rounded-none"
+                            title="Delete string"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Controls for Batch Mode */}
+                <div className="flex gap-2 items-center justify-between pt-1">
+                  {inputStrings.length < 5 ? (
+                    <button
+                      type="button"
+                      onClick={handleAddInputRow}
+                      className="text-[10px] font-bold text-[#0077B6] hover:text-[#023E8A] uppercase tracking-wider flex items-center gap-1 py-1 transition-colors cursor-pointer"
+                    >
+                      <Plus className="w-3.5 h-3.5" /> Add String ({inputStrings.length}/5)
+                    </button>
+                  ) : (
+                    <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">
+                      Max 5 strings reached
+                    </span>
+                  )}
+                  
+                  <button
+                    type="button"
+                    onClick={validateAll}
+                    disabled={isValidatingAll}
+                    className="bg-[#0077B6] hover:bg-[#023E8A] text-white text-[10px] font-bold uppercase tracking-wider px-4 py-2 shadow-sm rounded-none transition-all disabled:opacity-50 cursor-pointer"
+                  >
+                    {isValidatingAll ? "Running..." : "Run Batch"}
+                  </button>
+                </div>
+              </div>
+            )}
 
             <div className="mt-6 grid gap-4">
               <div>
@@ -162,7 +400,7 @@ export default function CFGSimulatorUI() {
                     <button
                       key={sample}
                       type="button"
-                      onClick={() => setInputString(sample)}
+                      onClick={() => handleSetSingleString(sample)}
                       className="rounded-none bg-white border border-emerald-200/60 px-3.5 py-2.5 text-xs text-emerald-700 font-bold hover:bg-emerald-50/80 hover:text-emerald-800 hover:border-emerald-400 hover:shadow-sm transition-all duration-200 cursor-pointer"
                     >
                       {sample}
@@ -180,7 +418,7 @@ export default function CFGSimulatorUI() {
                     <button
                       key={sample}
                       type="button"
-                      onClick={() => setInputString(sample)}
+                      onClick={() => handleSetSingleString(sample)}
                       className="rounded-none bg-white border border-rose-200/60 px-3.5 py-2.5 text-xs text-rose-700 font-bold hover:bg-rose-50/80 hover:text-rose-800 hover:border-rose-400 hover:shadow-sm transition-all duration-200 cursor-pointer"
                     >
                       {sample}
