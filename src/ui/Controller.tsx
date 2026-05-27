@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Terminal, Activity, Layers, Menu, X } from "lucide-react";
+import { Terminal, Activity, Layers, Menu, X, BookOpen } from "lucide-react";
 import DFASimulatorUI from "../dfa/DFASimulatorUI";
 import PDASimulatorUI from "../pda/PDASimulatorUI";
 import CFGSimulatorUI from "../cfg/CFGSimulatorUI";
+import UserManualUI from "./UserManualUI";
 import wallpaperImage from "../images/mc_wallpaper_movie_vista_1920x1080.png";
 
-type Tab = "DFA" | "PDA" | "CFG";
+type Tab = "DFA" | "PDA" | "CFG" | "MANUAL";
 
 export default function Controller() {
   const [activeTab, setActiveTab] = useState<Tab>("DFA");
@@ -16,6 +17,7 @@ export default function Controller() {
     { id: "DFA", label: "DFA Visualizer", icon: Activity },
     { id: "PDA", label: "PDA Simulator", icon: Layers },
     { id: "CFG", label: "CFG Compiler", icon: Terminal },
+    { id: "MANUAL", label: "User Manual", icon: BookOpen },
   ];
 
   return (
@@ -155,6 +157,7 @@ export default function Controller() {
               {activeTab === "DFA" && <DFASimulatorUI />}
               {activeTab === "PDA" && <PDASimulatorUI />}
               {activeTab === "CFG" && <CFGSimulatorUI />}
+              {activeTab === "MANUAL" && <UserManualUI />}
             </motion.div>
           </AnimatePresence>
         </div>

@@ -18,6 +18,8 @@ export const PDA_EXAMPLES: Record<string, PDA> = {
         isStart: true,
         isAccept: false,
         shape: "rounded",
+        x: -20,
+        y: 200,
       },
 
       // READ nodes (diamond)
@@ -27,6 +29,8 @@ export const PDA_EXAMPLES: Record<string, PDA> = {
         isStart: false,
         isAccept: false,
         shape: "diamond",
+        x: 160,
+        y: 200,
       },
       {
         id: "Q1",
@@ -34,6 +38,8 @@ export const PDA_EXAMPLES: Record<string, PDA> = {
         isStart: false,
         isAccept: false,
         shape: "diamond",
+        x: 280,
+        y: 100,
       },
       {
         id: "Q2",
@@ -41,6 +47,8 @@ export const PDA_EXAMPLES: Record<string, PDA> = {
         isStart: false,
         isAccept: false,
         shape: "diamond",
+        x: 280,
+        y: 300,
       },
       {
         id: "Q3",
@@ -48,6 +56,8 @@ export const PDA_EXAMPLES: Record<string, PDA> = {
         isStart: false,
         isAccept: false,
         shape: "diamond",
+        x: 400,
+        y: 200,
       },
       {
         id: "Q4",
@@ -55,6 +65,8 @@ export const PDA_EXAMPLES: Record<string, PDA> = {
         isStart: false,
         isAccept: false,
         shape: "diamond",
+        x: 520,
+        y: 180,
       },
       {
         id: "Q5",
@@ -62,6 +74,8 @@ export const PDA_EXAMPLES: Record<string, PDA> = {
         isStart: false,
         isAccept: false,
         shape: "diamond",
+        x: 640,
+        y: 220,
       },
       {
         id: "Q6",
@@ -69,6 +83,8 @@ export const PDA_EXAMPLES: Record<string, PDA> = {
         isStart: false,
         isAccept: false,
         shape: "diamond",
+        x: 760,
+        y: 100,
       },
       {
         id: "Q7",
@@ -76,6 +92,8 @@ export const PDA_EXAMPLES: Record<string, PDA> = {
         isStart: false,
         isAccept: false,
         shape: "diamond",
+        x: 760,
+        y: 200,
       },
       {
         id: "Q8",
@@ -83,6 +101,8 @@ export const PDA_EXAMPLES: Record<string, PDA> = {
         isStart: false,
         isAccept: false,
         shape: "diamond",
+        x: 760,
+        y: 300,
       },
       {
         id: "Q9",
@@ -90,6 +110,8 @@ export const PDA_EXAMPLES: Record<string, PDA> = {
         isStart: false,
         isAccept: false,
         shape: "diamond",
+        x: 880,
+        y: 200,
       },
 
       // ACCEPT node (oblong/rounded square)
@@ -99,6 +121,8 @@ export const PDA_EXAMPLES: Record<string, PDA> = {
         isStart: false,
         isAccept: true,
         shape: "rounded",
+        x: 960,
+        y: 200,
       },
     ],
     alphabet: ["0", "1"],
@@ -176,6 +200,8 @@ export const PDA_EXAMPLES: Record<string, PDA> = {
         isStart: true,
         isAccept: false,
         shape: "rounded",
+        x: -40,
+        y: 200,
       },
 
       // READ nodes (diamond)
@@ -185,6 +211,8 @@ export const PDA_EXAMPLES: Record<string, PDA> = {
         isStart: false,
         isAccept: false,
         shape: "diamond",
+        x: 140,
+        y: 200,
       },
       {
         id: "q1",
@@ -192,6 +220,8 @@ export const PDA_EXAMPLES: Record<string, PDA> = {
         isStart: false,
         isAccept: false,
         shape: "diamond",
+        x: 240,
+        y: 100,
       },
       {
         id: "q2",
@@ -199,6 +229,8 @@ export const PDA_EXAMPLES: Record<string, PDA> = {
         isStart: false,
         isAccept: false,
         shape: "diamond",
+        x: 240,
+        y: 300,
       },
       {
         id: "q3",
@@ -206,6 +238,8 @@ export const PDA_EXAMPLES: Record<string, PDA> = {
         isStart: false,
         isAccept: false,
         shape: "diamond",
+        x: 360,
+        y: 100,
       },
       {
         id: "q4",
@@ -213,6 +247,8 @@ export const PDA_EXAMPLES: Record<string, PDA> = {
         isStart: false,
         isAccept: false,
         shape: "diamond",
+        x: 360,
+        y: 200,
       },
       {
         id: "q5",
@@ -220,6 +256,8 @@ export const PDA_EXAMPLES: Record<string, PDA> = {
         isStart: false,
         isAccept: false,
         shape: "diamond",
+        x: 360,
+        y: 300,
       },
       {
         id: "q6",
@@ -227,6 +265,8 @@ export const PDA_EXAMPLES: Record<string, PDA> = {
         isStart: false,
         isAccept: false,
         shape: "diamond",
+        x: 480,
+        y: 200,
       },
       {
         id: "q7",
@@ -234,6 +274,8 @@ export const PDA_EXAMPLES: Record<string, PDA> = {
         isStart: false,
         isAccept: false,
         shape: "diamond",
+        x: 520,
+        y: 100,
       },
       {
         id: "q8",
@@ -241,6 +283,8 @@ export const PDA_EXAMPLES: Record<string, PDA> = {
         isStart: false,
         isAccept: false,
         shape: "diamond",
+        x: 520,
+        y: 300,
       },
       {
         id: "q9",
@@ -248,6 +292,8 @@ export const PDA_EXAMPLES: Record<string, PDA> = {
         isStart: false,
         isAccept: false,
         shape: "diamond",
+        x: 620,
+        y: 100,
       },
       {
         id: "q10",
@@ -255,6 +301,8 @@ export const PDA_EXAMPLES: Record<string, PDA> = {
         isStart: false,
         isAccept: false,
         shape: "diamond",
+        x: 620,
+        y: 300,
       },
       {
         id: "q11",
@@ -262,6 +310,8 @@ export const PDA_EXAMPLES: Record<string, PDA> = {
         isStart: false,
         isAccept: false,
         shape: "diamond",
+        x: 720,
+        y: 200,
       },
       {
         id: "q12",
@@ -269,6 +319,8 @@ export const PDA_EXAMPLES: Record<string, PDA> = {
         isStart: false,
         isAccept: false,
         shape: "diamond",
+        x: 800,
+        y: 100,
       },
       {
         id: "q13",
@@ -276,6 +328,8 @@ export const PDA_EXAMPLES: Record<string, PDA> = {
         isStart: false,
         isAccept: false,
         shape: "diamond",
+        x: 800,
+        y: 300,
       },
       {
         id: "q14",
@@ -283,6 +337,8 @@ export const PDA_EXAMPLES: Record<string, PDA> = {
         isStart: false,
         isAccept: false,
         shape: "diamond",
+        x: 890,
+        y: 100,
       },
       {
         id: "q15",
@@ -290,6 +346,8 @@ export const PDA_EXAMPLES: Record<string, PDA> = {
         isStart: false,
         isAccept: false,
         shape: "diamond",
+        x: 890,
+        y: 300,
       },
       {
         id: "T",
@@ -297,6 +355,8 @@ export const PDA_EXAMPLES: Record<string, PDA> = {
         isStart: false,
         isAccept: false,
         shape: "diamond",
+        x: 440,
+        y: 440,
       },
 
       // ACCEPT node (oblong/rounded square)
@@ -306,6 +366,8 @@ export const PDA_EXAMPLES: Record<string, PDA> = {
         isStart: false,
         isAccept: true,
         shape: "rounded",
+        x: 970,
+        y: 200,
       },
     ],
     alphabet: ["a", "b"],

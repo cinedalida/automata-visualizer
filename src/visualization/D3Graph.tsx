@@ -27,6 +27,29 @@ const D3Graph: React.FC<D3GraphProps> = ({
     d3.zoomIdentity,
   );
   const zoomRef = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+    };
+  }, []);
+
+  const handleToggleFullscreen = () => {
+    if (!containerRef.current) return;
+    if (!document.fullscreenElement) {
+      containerRef.current.requestFullscreen().catch((err) => {
+        console.error("Error attempting to enable full-screen mode:", err);
+      });
+    } else {
+      document.exitFullscreen();
+    }
+  };
 
   useEffect(() => {
     if (!svgRef.current) return;
@@ -78,7 +101,12 @@ const D3Graph: React.FC<D3GraphProps> = ({
       .attr("fill", "#0077B6");
 
     // Simulation nodes and links
-    const nodes = states.map((s) => ({ ...s }));
+    // If nodes have predefined coordinates from the data layer, freeze them statically (set fx, fy)
+    const nodes = states.map((s) => ({
+      ...s,
+      fx: s.x !== undefined ? s.x : undefined,
+      fy: s.y !== undefined ? s.y : undefined,
+    }));
 
     // Group transitions by source and target
     const linkGroups = new Map<string, any>();
@@ -123,6 +151,10 @@ const D3Graph: React.FC<D3GraphProps> = ({
       .append("path")
       .attr("class", "transition-path")
       .attr("stroke", (d: any) => (d.isActive ? "#0077B6" : "#94a3b8"))
+      .attr("stroke-dasharray", (d: any) => {
+        const isConnectedToTrap = d.source.id === "T" || d.target.id === "T";
+        return isConnectedToTrap ? "5,5" : null;
+      })
       .attr("stroke-width", (d: any) => (d.isActive ? 3 : 2))
       .attr("fill", "none")
       .attr("marker-end", (d: any) =>
@@ -330,17 +362,20 @@ const D3Graph: React.FC<D3GraphProps> = ({
         return `M ${x} ${y} C ${x - 40} ${y - 60}, ${x + 40} ${y - 60}, ${x} ${y}`;
       }
 
+      const dx = d.target.x - d.source.x;
+      const dy = d.target.y - d.source.y;
+      const dr = Math.sqrt(dx * dx + dy * dy);
+
       const hasReverse = links.some(
         (l) => l.source.id === d.target.id && l.target.id === d.source.id,
       );
       if (hasReverse) {
-        const dx = d.target.x - d.source.x;
-        const dy = d.target.y - d.source.y;
-        const dr = Math.sqrt(dx * dx + dy * dy);
+        // Curve bidirectional links strongly to avoid collision
         return `M ${d.source.x},${d.source.y} A ${dr},${dr} 0 0,1 ${d.target.x},${d.target.y}`;
       }
 
-      return `M ${d.source.x},${d.source.y} L ${d.target.x},${d.target.y}`;
+      // Curve standard links subtly and elegantly
+      return `M ${d.source.x},${d.source.y} A ${dr * 1.8},${dr * 1.8} 0 0,1 ${d.target.x},${d.target.y}`;
     });
 
     linkLabel.each(function (d: any) {
@@ -354,7 +389,7 @@ const D3Graph: React.FC<D3GraphProps> = ({
       if (isSelfLoop) {
         x = d.source.x;
         y = d.source.y - 65;
-      } else if (hasReverse) {
+      } else {
         const dx = d.target.x - d.source.x;
         const dy = d.target.y - d.source.y;
 
@@ -362,12 +397,10 @@ const D3Graph: React.FC<D3GraphProps> = ({
         const midY = (d.source.y + d.target.y) / 2;
 
         const angle = Math.atan2(dy, dx);
-        const offset = 30;
+        // Offset standard labels subtly (14px) and bidirectional labels more (26px) next to the curves
+        const offset = hasReverse ? 26 : 14;
         x = midX + Math.sin(angle) * offset;
         y = midY - Math.cos(angle) * offset;
-      } else {
-        x = (d.source.x + d.target.x) / 2;
-        y = (d.source.y + d.target.y) / 2 - 5;
       }
 
       el.attr("x", x).attr("y", y);
@@ -402,7 +435,11 @@ const D3Graph: React.FC<D3GraphProps> = ({
   };
 
   return (
-    <div className="w-full h-full bg-slate-50/50 rounded-none overflow-hidden relative border border-slate-100/50 shadow-inner">
+    <div
+      ref={containerRef}
+      className={`w-full h-full bg-slate-50/50 rounded-none overflow-hidden relative border border-slate-100/50 shadow-inner transition-all duration-300 ${isFullscreen ? "bg-white p-6 flex items-center justify-center" : ""}`}
+      style={{ backgroundColor: isFullscreen ? "#ffffff" : undefined }}
+    >
       {/* Zoom Controls */}
       <div className="absolute top-4 right-4 z-10 flex gap-2">
         <button
@@ -425,6 +462,13 @@ const D3Graph: React.FC<D3GraphProps> = ({
           title="Reset Zoom"
         >
           Reset
+        </button>
+        <button
+          onClick={handleToggleFullscreen}
+          className="bg-white border border-slate-200 text-slate-700 rounded-none px-3.5 py-2.5 transition-all text-[11px] hover:bg-blue-50 hover:text-[#0077B6] hover:border-blue-200 shadow-sm cursor-pointer font-bold"
+          title={isFullscreen ? "Exit Fullscreen" : "Fullscreen View"}
+        >
+          {isFullscreen ? "Exit ⛶" : "Fullscreen ⛶"}
         </button>
       </div>
       <svg

@@ -2,16 +2,16 @@ import { DFA } from "../types";
 
 export const DFA1: DFA = {
   states: [
-    { id: "q0", label: "q0", isStart: true, isAccept: false },
-    { id: "q1", label: "q1", isStart: false, isAccept: false }, // Saw '1'
-    { id: "q2", label: "q2", isStart: false, isAccept: false }, // Saw '0'
-    { id: "q3", label: "q3", isStart: false, isAccept: false }, // DOUBLE FOUND
-    { id: "q4", label: "q4", isStart: false, isAccept: false }, // BRIDGE SATISFIED / Seeking '1'
-    { id: "q5", label: "q5", isStart: false, isAccept: false }, // Saw '1' (Pattern Start)
-    { id: "q6", label: "q6", isStart: false, isAccept: false }, // Saw '10'
-    { id: "q7", label: "q7", isStart: false, isAccept: false }, // Saw '110' (Recovery)
-    { id: "q8", label: "q8", isStart: false, isAccept: false }, // Saw '11'
-    { id: "q9", label: "q9", isStart: false, isAccept: true }, // ACCEPT / TAIL
+    { id: "q0", label: "q0", isStart: true, isAccept: false, x: 80, y: 200 },
+    { id: "q1", label: "q1", isStart: false, isAccept: false, x: 200, y: 100 }, // Saw '1'
+    { id: "q2", label: "q2", isStart: false, isAccept: false, x: 200, y: 300 }, // Saw '0'
+    { id: "q3", label: "q3", isStart: false, isAccept: false, x: 320, y: 200 }, // DOUBLE FOUND
+    { id: "q4", label: "q4", isStart: false, isAccept: false, x: 440, y: 180 }, // BRIDGE SATISFIED / Seeking '1'
+    { id: "q5", label: "q5", isStart: false, isAccept: false, x: 560, y: 220 }, // Saw '1' (Pattern Start)
+    { id: "q6", label: "q6", isStart: false, isAccept: false, x: 680, y: 100 }, // Saw '10'
+    { id: "q7", label: "q7", isStart: false, isAccept: false, x: 680, y: 200 }, // Saw '110' (Recovery)
+    { id: "q8", label: "q8", isStart: false, isAccept: false, x: 680, y: 300 }, // Saw '11'
+    { id: "q9", label: "q9", isStart: false, isAccept: true, x: 800, y: 200 }, // ACCEPT / TAIL
   ],
   alphabet: ["0", "1"],
   transitions: [
@@ -61,23 +61,23 @@ export const DFA1: DFA = {
 
 export const DFA2: DFA = {
   states: [
-    { id: "q0", label: "q0", isStart: true, isAccept: false },
-    { id: "q1", label: "q1", isStart: false, isAccept: false },
-    { id: "q2", label: "q2", isStart: false, isAccept: false },
-    { id: "q3", label: "q3", isStart: false, isAccept: false },
-    { id: "q4", label: "q4", isStart: false, isAccept: false },
-    { id: "q5", label: "q5", isStart: false, isAccept: false },
-    { id: "q6", label: "q6", isStart: false, isAccept: false },
-    { id: "q7", label: "q7", isStart: false, isAccept: false },
-    { id: "q8", label: "q8", isStart: false, isAccept: false },
-    { id: "q9", label: "q9", isStart: false, isAccept: false },
-    { id: "q10", label: "q10", isStart: false, isAccept: false },
-    { id: "q11", label: "q11", isStart: false, isAccept: false },
-    { id: "q12", label: "q12", isStart: false, isAccept: false },
-    { id: "q13", label: "q13", isStart: false, isAccept: false },
-    { id: "q14", label: "q14", isStart: false, isAccept: true },
-    { id: "q15", label: "q15", isStart: false, isAccept: true },
-    { id: "T", label: "T", isStart: false, isAccept: false },
+    { id: "q0", label: "q0", isStart: true, isAccept: false, x: 80, y: 200 },
+    { id: "q1", label: "q1", isStart: false, isAccept: false, x: 200, y: 100 },
+    { id: "q2", label: "q2", isStart: false, isAccept: false, x: 200, y: 300 },
+    { id: "q3", label: "q3", isStart: false, isAccept: false, x: 320, y: 100 },
+    { id: "q4", label: "q4", isStart: false, isAccept: false, x: 320, y: 200 },
+    { id: "q5", label: "q5", isStart: false, isAccept: false, x: 320, y: 300 },
+    { id: "q6", label: "q6", isStart: false, isAccept: false, x: 440, y: 200 },
+    { id: "q7", label: "q7", isStart: false, isAccept: false, x: 480, y: 100 },
+    { id: "q8", label: "q8", isStart: false, isAccept: false, x: 480, y: 300 },
+    { id: "q9", label: "q9", isStart: false, isAccept: false, x: 580, y: 100 },
+    { id: "q10", label: "q10", isStart: false, isAccept: false, x: 580, y: 300 },
+    { id: "q11", label: "q11", isStart: false, isAccept: false, x: 680, y: 200 },
+    { id: "q12", label: "q12", isStart: false, isAccept: false, x: 760, y: 100 },
+    { id: "q13", label: "q13", isStart: false, isAccept: false, x: 760, y: 300 },
+    { id: "q14", label: "q14", isStart: false, isAccept: true, x: 850, y: 100 },
+    { id: "q15", label: "q15", isStart: false, isAccept: true, x: 850, y: 300 },
+    { id: "T", label: "T", isStart: false, isAccept: false, x: 400, y: 440 },
   ],
   alphabet: ["a", "b"],
   transitions: [
