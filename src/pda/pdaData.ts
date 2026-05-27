@@ -121,7 +121,7 @@ export const PDA_EXAMPLES: Record<string, PDA> = {
         isStart: false,
         isAccept: true,
         shape: "rounded",
-        x: 960,
+        x: 1040,
         y: 200,
       },
     ],
